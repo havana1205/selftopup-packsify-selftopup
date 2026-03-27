@@ -8,207 +8,202 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--blue:#81adf3;--navy:#232e55;--dn:#1e1f7e;--bg:#0a0e1f;--card:#111627;--brd:rgba(129,173,243,.1);--brd2:rgba(129,173,243,.2);--grn:#00c853;--grnd:rgba(0,200,83,.15);--yel:#ffc701;--yeld:rgba(255,199,1,.12);--red:#e8506a;--redd:rgba(232,80,106,.12);--pur:#a148fb;--txt:#e0e6f0;--dim:#6a7d94;--wh:#fff}
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;-webkit-text-size-adjust:100%}
+:root{--blue:#81adf3;--navy:#232e55;--dn:#1e1f7e;--bg:#0a0e1f;--card:#111627;--brd:rgba(129,173,243,.1);--brd2:rgba(129,173,243,.2);--grn:#00c853;--grnd:rgba(0,200,83,.15);--yel:#ffc701;--yeld:rgba(255,199,1,.12);--red:#e8506a;--redd:rgba(232,80,106,.12);--txt:#e0e6f0;--dim:#6a7d94;--wh:#fff}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
 
 /* Header */
-.hdr{background:linear-gradient(135deg,var(--navy),var(--dn));border-bottom:1px solid var(--brd);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.logo{font-size:18px;font-weight:800;color:var(--blue);white-space:nowrap}.logo span{color:var(--wh);font-weight:400;font-size:12px;margin-left:6px;opacity:.5}
-.hdr-r{display:flex;align-items:center;gap:8px}
+.hdr{background:linear-gradient(135deg,var(--navy),var(--dn));border-bottom:1px solid var(--brd);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;gap:8px}
+.logo{font-size:17px;font-weight:800;color:var(--blue);white-space:nowrap}.logo span{color:var(--wh);font-weight:400;font-size:11px;margin-left:5px;opacity:.5}
+.hdr-r{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .conn{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:500;color:var(--dim);background:rgba(255,255,255,.04);border:1px solid var(--brd);border-radius:14px;padding:3px 8px}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--grn);flex-shrink:0}.dot.off{background:var(--red)}
+.lang-btn{font-family:'Outfit',sans-serif;font-size:10px;font-weight:600;padding:3px 8px;border-radius:14px;border:1px solid var(--brd);background:rgba(255,255,255,.04);color:var(--dim);cursor:pointer}
+.lang-btn:hover{color:var(--blue);border-color:var(--brd2)}
 
-.pg{padding:16px;max-width:1600px;margin:0 auto}
+.pg{padding:14px;max-width:1600px;margin:0 auto}
 
-/* Tab navigation for mobile */
-.tabs{display:none;background:var(--card);border:1px solid var(--brd);border-radius:10px;margin-bottom:14px;overflow:hidden}
-.tabs button{flex:1;padding:10px 8px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:var(--dim);background:none;border:none;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent}
-.tabs button.active{color:var(--blue);border-bottom-color:var(--blue);background:rgba(129,173,243,.06)}
+/* Desktop layout */
+.main-grid{display:grid;grid-template-columns:300px 1fr;gap:14px;margin-bottom:14px;align-items:start}
 
-/* Desktop: side by side */
-.main-grid{display:grid;grid-template-columns:300px 1fr;gap:16px;margin-bottom:16px;align-items:start}
-
-/* VNC Panel */
-.vnc-panel{background:var(--card);border:1px solid var(--brd2);border-radius:14px;padding:10px;position:sticky;top:52px}
+/* VNC */
+.vnc-panel{background:var(--card);border:1px solid var(--brd2);border-radius:14px;padding:10px}
 .vnc-panel h3{font-size:12px;font-weight:700;color:var(--wh);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
 .vnc-panel h3 .pill{font-size:8px}
-.vnc-frame{width:100%;max-width:280px;height:560px;margin:0 auto;background:#000;border-radius:18px;overflow:hidden;position:relative;border:2px solid #1e2233}
-.vnc-frame iframe{width:100%;height:100%;border:none;display:block}
-.vnc-placeholder{display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:11px;text-align:center;padding:16px}
+.vnc-frame{width:276px;height:560px;margin:0 auto;background:#000;border-radius:16px;overflow:hidden;border:2px solid #1e2233}
+.vnc-frame iframe{width:100%;height:100%;border:none;display:block;overflow:hidden}
+.vnc-placeholder{display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:10px;text-align:center;padding:16px}
 .vnc-ctrl{display:flex;gap:5px;margin-top:8px}.vnc-ctrl .btn{flex:1;text-align:center}
 
-/* Right panel */
+/* Right */
 .right-panel{display:flex;flex-direction:column;gap:12px;min-width:0}
-
-/* Simulate */
 .sim{background:linear-gradient(135deg,rgba(129,173,243,.06),rgba(161,72,251,.04));border:1px solid var(--brd2);border-radius:10px;padding:12px 14px}
 .sim-t{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px}
 .sim-row{display:flex;gap:6px;align-items:end;flex-wrap:wrap}
 .sim-field label{display:block;font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--dim);margin-bottom:2px}
-.sim-field input,.sim-field select{font-family:'Outfit',sans-serif;font-size:11px;padding:5px 7px;background:rgba(255,255,255,.06);border:1px solid var(--brd);border-radius:5px;color:var(--wh);width:90px}
+.sim-field input,.sim-field select{font-family:'Outfit',sans-serif;font-size:11px;padding:4px 7px;background:rgba(255,255,255,.06);border:1px solid var(--brd);border-radius:4px;color:var(--wh);width:88px}
 .sim-field input:focus,.sim-field select:focus{outline:none;border-color:var(--blue)}
 .sim-field select option{background:#1a1d2e}
-.sim-actions{display:flex;gap:4px;align-items:end;padding-bottom:1px}
-.sim-log{margin-top:6px;background:rgba(0,0,0,.3);border-radius:5px;padding:6px 8px;max-height:80px;overflow-y:auto;font-size:9px;font-family:'Courier New',monospace;color:var(--dim);line-height:1.5}
+.sim-actions{display:flex;gap:4px;align-items:end}
+.sim-log{margin-top:6px;background:rgba(0,0,0,.3);border-radius:5px;padding:6px 8px;max-height:76px;overflow-y:auto;font-size:9px;font-family:'Courier New',monospace;color:var(--dim);line-height:1.5}
 .sim-log .ok{color:var(--grn)}.sim-log .err{color:var(--red)}.sim-log .info{color:var(--blue)}
 
-/* Stats */
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.sc{background:var(--card);border:1px solid var(--brd);border-radius:7px;padding:8px 10px}.sc:hover{border-color:var(--brd2)}
+.sc{background:var(--card);border:1px solid var(--brd);border-radius:7px;padding:8px 10px}
 .sc-l{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--dim);margin-bottom:2px}
 .sc-v{font-size:20px;font-weight:700;color:var(--wh);line-height:1}.sc-v.g{color:var(--grn)}.sc-v.y{color:var(--yel)}.sc-v.b{color:var(--blue)}
 .sc-s{font-size:8px;color:var(--dim);margin-top:2px}
 
-/* Tables */
-.sec{margin-bottom:0}.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.sec{}.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
 .st{font-size:12px;font-weight:700;color:var(--wh)}.cnt{font-size:8px;font-weight:600;color:var(--dim);background:rgba(255,255,255,.04);border-radius:5px;padding:2px 6px}
 .tw{background:var(--card);border:1px solid var(--brd);border-radius:7px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:collapse;font-size:11px;min-width:400px}
-th{text-align:left;padding:6px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--dim);background:rgba(255,255,255,.02);border-bottom:1px solid var(--brd);white-space:nowrap}
-td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle;white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap}
+th{text-align:left;padding:6px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--dim);background:rgba(255,255,255,.02);border-bottom:1px solid var(--brd)}
+td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
 tr:last-child td{border-bottom:none}tr:hover td{background:rgba(129,173,243,.03)}
 
-.pill{display:inline-flex;align-items:center;gap:3px;font-size:8px;font-weight:600;padding:2px 6px;border-radius:10px;text-transform:uppercase;letter-spacing:.3px}
+.pill{display:inline-flex;align-items:center;gap:3px;font-size:8px;font-weight:600;padding:2px 6px;border-radius:10px;text-transform:uppercase}
 .pill.free{background:var(--grnd);color:var(--grn)}.pill.busy{background:var(--yeld);color:var(--yel)}.pill.offline{background:var(--redd);color:var(--red)}
 .pill.active{background:var(--grnd);color:var(--grn)}.pill.ended,.pill.cancelled{background:rgba(255,255,255,.06);color:var(--dim)}.pill.expired{background:var(--redd);color:var(--red)}
 .pill.waiting{background:var(--yeld);color:var(--yel)}.pill.confirmed{background:var(--grnd);color:var(--grn)}
 .pd{width:3px;height:3px;border-radius:50%;background:currentColor}.pill.active .pd{animation:pu 2s infinite}
 @keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
 
-.btn{font-family:'Outfit',sans-serif;font-size:10px;font-weight:600;padding:4px 9px;border-radius:5px;border:1px solid var(--brd);background:rgba(255,255,255,.04);color:var(--dim);cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn{font-family:'Outfit',sans-serif;font-size:10px;font-weight:600;padding:4px 9px;border-radius:5px;border:1px solid var(--brd);background:rgba(255,255,255,.04);color:var(--dim);cursor:pointer;transition:all .15s}
 .btn:hover{background:rgba(255,255,255,.08);color:var(--txt)}.btn:active{transform:scale(.96)}
-.btn.danger{border-color:rgba(232,80,106,.3);color:var(--red)}.btn.danger:hover{background:var(--redd)}
-.btn.primary{border-color:rgba(129,173,243,.3);color:var(--blue)}.btn.primary:hover{background:rgba(129,173,243,.1)}
-.btn.success{border-color:rgba(0,200,83,.3);color:var(--grn)}.btn.success:hover{background:var(--grnd)}
-.btn.sm{padding:5px 11px;font-size:11px;border-radius:5px}.bg{display:flex;gap:3px}
+.btn.danger{border-color:rgba(232,80,106,.3);color:var(--red)}.btn.primary{border-color:rgba(129,173,243,.3);color:var(--blue)}
+.btn.success{border-color:rgba(0,200,83,.3);color:var(--grn)}
+.btn.sm{padding:5px 11px;font-size:11px}.bg{display:flex;gap:3px}
 .bi{width:55px;padding:3px 5px;font-family:'Outfit',sans-serif;font-size:10px;color:var(--wh);background:rgba(255,255,255,.06);border:1px solid var(--brd);border-radius:4px;text-align:right}.bi:focus{outline:none;border-color:var(--blue)}
 .empty{text-align:center;padding:16px 8px;color:var(--dim);font-size:10px}.mono{font-variant-numeric:tabular-nums}.dim{color:var(--dim)}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .bottom{margin-top:14px}
 
-.toasts{position:fixed;bottom:12px;right:12px;z-index:1000;display:flex;flex-direction:column;gap:4px}
-.toast{background:var(--card);border:1px solid var(--brd2);border-radius:7px;padding:8px 14px;font-size:11px;box-shadow:0 6px 24px rgba(0,0,0,.4);animation:si .3s ease;max-width:260px}
+.toasts{position:fixed;bottom:10px;right:10px;z-index:1000;display:flex;flex-direction:column;gap:4px}
+.toast{background:var(--card);border:1px solid var(--brd2);border-radius:7px;padding:8px 14px;font-size:11px;box-shadow:0 6px 24px rgba(0,0,0,.4);animation:si .3s ease;max-width:240px}
 .toast.success{border-left:3px solid var(--grn)}.toast.error{border-left:3px solid var(--red)}.toast.info{border-left:3px solid var(--blue)}
 @keyframes si{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
 
-/* Tab content visibility */
-.tab-content{display:block}
-
-/* ── TABLET (max 1024px) ── */
+/* Tablet */
 @media(max-width:1024px){
+  .main-grid{grid-template-columns:260px 1fr}
+  .vnc-frame{width:236px;height:480px}
+}
+
+/* Small tablet / large phone */
+@media(max-width:768px){
   .main-grid{grid-template-columns:1fr}
-  .vnc-panel{position:relative;top:0}
-  .vnc-frame{max-width:320px;height:620px}
-  .stats{grid-template-columns:repeat(5,1fr)}
-  .g2{grid-template-columns:1fr 1fr}
+  .vnc-panel{order:-1}
+  .vnc-frame{width:100%;max-width:300px;height:560px;margin:0 auto}
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:1fr}
 }
 
-/* ── MOBILE (max 640px) ── */
-@media(max-width:640px){
-  .pg{padding:10px}
-  .logo{font-size:16px}.logo span{font-size:10px}
-  .hdr{padding:8px 12px}
-
-  /* Show tab navigation on mobile */
-  .tabs{display:flex}
-
-  /* Hide sections by default on mobile, show based on active tab */
-  .tab-vnc,.tab-controls,.tab-data{display:none}
-  .tab-vnc.active,.tab-controls.active,.tab-data.active{display:block}
-
-  .main-grid{grid-template-columns:1fr;gap:10px}
-  .vnc-panel{position:relative;top:0}
-  .vnc-frame{max-width:100%;height:calc(100vw * 1.95);max-height:620px}
-
-  .stats{grid-template-columns:repeat(3,1fr);gap:5px}
-  .sc{padding:7px 8px}
-  .sc-v{font-size:18px}
-
-  .g2{grid-template-columns:1fr;gap:10px}
-
-  .sim-row{gap:5px}
-  .sim-field input,.sim-field select{width:80px;font-size:10px;padding:4px 6px}
-  .sim-actions{flex-wrap:wrap}
-
-  table{min-width:350px;font-size:10px}
+/* Phone */
+@media(max-width:480px){
+  .pg{padding:8px}
+  .hdr{padding:8px 10px}
+  .logo{font-size:15px}
+  .vnc-frame{max-width:100%;height:calc(100vw * 1.85)}
+  .stats{grid-template-columns:repeat(3,1fr);gap:4px}
+  .sc{padding:6px 8px}.sc-v{font-size:17px}
+  .sim-field input,.sim-field select{width:72px;font-size:10px}
+  .sim-row{gap:4px}
+  table{font-size:10px}
   th,td{padding:5px 6px}
-}
-
-/* ── SMALL PHONE (max 380px) ── */
-@media(max-width:380px){
-  .stats{grid-template-columns:repeat(2,1fr)}
-  .vnc-frame{height:calc(100vw * 2)}
-  .sim-field input,.sim-field select{width:70px}
 }
 </style>
 </head>
 <body>
 <div class="hdr">
-  <div class="logo">PACKSIFY <span>Top-Up Admin</span></div>
+  <div class="logo">PACKSIFY <span data-en="Top-Up Admin" data-zh="自助充值管理">Top-Up Admin</span></div>
   <div class="hdr-r">
+    <button class="lang-btn" onclick="toggleLang()" id="langBtn">中文</button>
     <div class="conn"><div class="dot" id="cD"></div><span id="cL">...</span></div>
-    <button class="btn primary" onclick="refreshAll()">Refresh</button>
+    <button class="btn primary" onclick="refreshAll()" data-en="Refresh" data-zh="刷新">Refresh</button>
   </div>
 </div>
 <div class="pg">
-
-  <!-- Mobile tabs -->
-  <div class="tabs" id="tabs">
-    <button class="active" onclick="showTab('vnc')">Screen</button>
-    <button onclick="showTab('controls')">Controls</button>
-    <button onclick="showTab('data')">Data</button>
-  </div>
-
   <div class="main-grid">
-    <!-- VNC -->
-    <div class="vnc-panel tab-vnc tab-content active" id="tabVnc">
-      <h3>Device <span class="pill" id="vSt">off</span></h3>
-      <div class="vnc-frame" id="vf"><div class="vnc-placeholder" id="vPH">Click Connect</div></div>
-      <div class="vnc-ctrl"><button class="btn success" onclick="vncOn()">Connect</button><button class="btn" onclick="vncOff()">Disconnect</button></div>
-    </div>
-
-    <!-- Controls -->
-    <div class="right-panel tab-controls tab-content active" id="tabControls">
-      <div class="sim"><div class="sim-t">Simulate Session</div>
-        <div class="sim-row">
-          <div class="sim-field"><label>Customer</label><input id="simC" value="whale-001"/></div>
-          <div class="sim-field"><label>Game</label><select id="simG"><option>kingshot</option><option>whiteout</option><option>evony</option><option>lastwar</option></select></div>
-          <div class="sim-field"><label>Credits</label><input id="simCr" type="number" value="50" min="5" style="width:55px"/></div>
-          <div class="sim-actions"><button class="btn success sm" onclick="simStart()">Start</button><button class="btn primary sm" onclick="simPurchase()">Buy</button><button class="btn danger sm" onclick="simEnd()">End</button></div>
-        </div><div class="sim-log" id="sL"><span class="info">Ready.</span></div></div>
-      <div class="stats">
-        <div class="sc"><div class="sc-l">Online</div><div class="sc-v g" id="sOn">-</div><div class="sc-s" id="sOnS"></div></div>
-        <div class="sc"><div class="sc-l">Sessions</div><div class="sc-v y" id="sSe">-</div><div class="sc-s" id="sSeS"></div></div>
-        <div class="sc"><div class="sc-l">Queue</div><div class="sc-v b" id="sQ">-</div><div class="sc-s" id="sQS"></div></div>
-        <div class="sc"><div class="sc-l">Buys</div><div class="sc-v" id="sP">-</div><div class="sc-s" id="sPS"></div></div>
-        <div class="sc"><div class="sc-l">Balance</div><div class="sc-v" id="sB">-</div><div class="sc-s">Apple</div></div>
+    <div class="vnc-panel">
+      <h3><span data-en="Device Screen" data-zh="设备屏幕">Device Screen</span> <span class="pill" id="vSt">off</span></h3>
+      <div class="vnc-frame" id="vf"><div class="vnc-placeholder" data-en="Click Connect" data-zh="点击连接" id="vPH">Click Connect</div></div>
+      <div class="vnc-ctrl">
+        <button class="btn success" onclick="vncOn()" data-en="Connect" data-zh="连接">Connect</button>
+        <button class="btn" onclick="vncOff()" data-en="Disconnect" data-zh="断开">Disconnect</button>
       </div>
-      <div class="sec"><div class="sh"><div class="st">Devices</div><div class="cnt" id="dC">0</div></div><div class="tw"><table><thead><tr><th>Device</th><th>Status</th><th>Game</th><th>Bal</th><th>Customer</th><th>HB</th><th></th></tr></thead><tbody id="dB"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody></table></div></div>
+    </div>
+    <div class="right-panel">
+      <div class="sim">
+        <div class="sim-t" data-en="Simulate Session" data-zh="模拟会话">Simulate Session</div>
+        <div class="sim-row">
+          <div class="sim-field"><label data-en="Customer" data-zh="客户">Customer</label><input id="simC" value="whale-001"/></div>
+          <div class="sim-field"><label data-en="Game" data-zh="游戏">Game</label><select id="simG"><option>kingshot</option><option>whiteout</option><option>evony</option><option>lastwar</option></select></div>
+          <div class="sim-field"><label data-en="Credits" data-zh="额度">Credits</label><input id="simCr" type="number" value="50" min="5" style="width:50px"/></div>
+          <div class="sim-actions">
+            <button class="btn success sm" onclick="simStart()" data-en="Start" data-zh="开始">Start</button>
+            <button class="btn primary sm" onclick="simPurchase()" data-en="Buy" data-zh="购买">Buy</button>
+            <button class="btn danger sm" onclick="simEnd()" data-en="End" data-zh="结束">End</button>
+          </div>
+        </div>
+        <div class="sim-log" id="sL"><span class="info" data-en="Ready." data-zh="就绪。">Ready.</span></div>
+      </div>
+      <div class="stats">
+        <div class="sc"><div class="sc-l" data-en="Online" data-zh="在线">Online</div><div class="sc-v g" id="sOn">-</div><div class="sc-s" id="sOnS"></div></div>
+        <div class="sc"><div class="sc-l" data-en="Sessions" data-zh="会话">Sessions</div><div class="sc-v y" id="sSe">-</div><div class="sc-s" id="sSeS"></div></div>
+        <div class="sc"><div class="sc-l" data-en="Queue" data-zh="排队">Queue</div><div class="sc-v b" id="sQ">-</div><div class="sc-s" id="sQS"></div></div>
+        <div class="sc"><div class="sc-l" data-en="Buys" data-zh="购买">Buys</div><div class="sc-v" id="sP">-</div><div class="sc-s" id="sPS"></div></div>
+        <div class="sc"><div class="sc-l" data-en="Balance" data-zh="余额">Balance</div><div class="sc-v" id="sB">-</div><div class="sc-s">Apple $</div></div>
+      </div>
+      <div class="sec">
+        <div class="sh"><div class="st" data-en="Devices" data-zh="设备">Devices</div><div class="cnt" id="dC">0</div></div>
+        <div class="tw"><table><thead><tr>
+          <th data-en="Device" data-zh="设备">Device</th><th data-en="Status" data-zh="状态">Status</th><th data-en="Game" data-zh="游戏">Game</th>
+          <th data-en="Bal" data-zh="余额">Bal</th><th data-en="Customer" data-zh="客户">Customer</th><th>HB</th><th></th>
+        </tr></thead><tbody id="dB"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody></table></div>
+      </div>
     </div>
   </div>
-
-  <!-- Data tables -->
-  <div class="tab-data tab-content active" id="tabData">
-    <div class="g2">
-      <div class="sec"><div class="sh"><div class="st">Sessions</div><div class="cnt" id="seC">0</div></div><div class="tw"><table><thead><tr><th>Customer</th><th>Device</th><th>Time</th><th>Credits</th><th>Buys</th><th></th></tr></thead><tbody id="seB"><tr><td colspan="6" class="empty">No sessions</td></tr></tbody></table></div></div>
-      <div class="sec"><div class="sh"><div class="st">Queue</div><div class="cnt" id="qC">0</div></div><div class="tw"><table><thead><tr><th>#</th><th>Customer</th><th>Game</th><th>Wait</th><th></th></tr></thead><tbody id="qB"><tr><td colspan="5" class="empty">Empty</td></tr></tbody></table></div></div>
+  <div class="g2">
+    <div class="sec">
+      <div class="sh"><div class="st" data-en="Active Sessions" data-zh="活跃会话">Active Sessions</div><div class="cnt" id="seC">0</div></div>
+      <div class="tw"><table><thead><tr>
+        <th data-en="Customer" data-zh="客户">Customer</th><th data-en="Device" data-zh="设备">Device</th>
+        <th data-en="Time" data-zh="时间">Time</th><th data-en="Credits" data-zh="额度">Credits</th>
+        <th data-en="Buys" data-zh="购买">Buys</th><th></th>
+      </tr></thead><tbody id="seB"><tr><td colspan="6" class="empty" data-en="No sessions" data-zh="无会话">No sessions</td></tr></tbody></table></div>
     </div>
-    <div class="bottom"><div class="sec"><div class="sh"><div class="st">Purchases</div><div class="cnt" id="pC">0</div></div><div class="tw"><table><thead><tr><th>Time</th><th>Customer</th><th>Device</th><th>Pack</th><th>Price</th><th>Status</th></tr></thead><tbody id="pB"><tr><td colspan="6" class="empty">No purchases</td></tr></tbody></table></div></div></div>
+    <div class="sec">
+      <div class="sh"><div class="st" data-en="Queue" data-zh="排队">Queue</div><div class="cnt" id="qC">0</div></div>
+      <div class="tw"><table><thead><tr>
+        <th>#</th><th data-en="Customer" data-zh="客户">Customer</th>
+        <th data-en="Game" data-zh="游戏">Game</th><th data-en="Wait" data-zh="等待">Wait</th><th></th>
+      </tr></thead><tbody id="qB"><tr><td colspan="5" class="empty" data-en="Empty" data-zh="空">Empty</td></tr></tbody></table></div>
+    </div>
+  </div>
+  <div class="bottom">
+    <div class="sec">
+      <div class="sh"><div class="st" data-en="Purchases" data-zh="购买记录">Purchases</div><div class="cnt" id="pC">0</div></div>
+      <div class="tw"><table><thead><tr>
+        <th data-en="Time" data-zh="时间">Time</th><th data-en="Customer" data-zh="客户">Customer</th>
+        <th data-en="Device" data-zh="设备">Device</th><th data-en="Pack" data-zh="礼包">Pack</th>
+        <th data-en="Price" data-zh="价格">Price</th><th data-en="Status" data-zh="状态">Status</th>
+      </tr></thead><tbody id="pB"><tr><td colspan="6" class="empty" data-en="No purchases" data-zh="无购买记录">No purchases</td></tr></tbody></table></div>
+    </div>
   </div>
 </div>
 <div class="toasts" id="toasts"></div>
 <script>
 var db=window.supabase.createClient('https://tewircokuexllpzmrapz.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRld2lyY29rdWV4bGxwem1yYXB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MjI3NzMsImV4cCI6MjA5MDE5ODc3M30.6JaFXJwq1CQx8u4HPfAYSkLFSDSSTEcAJeF_4YFCRKY');
-var D=[],S=[],P=[],Q=[],sim=null;
+var D=[],S=[],P=[],Q=[],sim=null,lang='en';
 function $(id){return document.getElementById(id)}
 
-// Mobile tab switching
-function showTab(tab){
-  document.querySelectorAll('.tabs button').forEach(function(b,i){b.classList.remove('active')});
-  document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active')});
-  if(tab==='vnc'){$('tabs').children[0].classList.add('active');$('tabVnc').classList.add('active')}
-  else if(tab==='controls'){$('tabs').children[1].classList.add('active');$('tabControls').classList.add('active')}
-  else{$('tabs').children[2].classList.add('active');$('tabData').classList.add('active')}
+// Language toggle
+function toggleLang(){
+  lang=lang==='en'?'zh':'en';
+  $('langBtn').textContent=lang==='en'?'中文':'EN';
+  document.querySelectorAll('[data-'+lang+']').forEach(function(el){
+    el.textContent=el.getAttribute('data-'+lang);
+  });
 }
 
 // VNC
@@ -218,13 +213,13 @@ function vncOn(){
   f.src='/vnc_lite.html?autoconnect=true&resize=scale&_='+Date.now();
   f.setAttribute('scrolling','no');
   f.setAttribute('allowfullscreen','');
-  f.style.cssText='width:100%;height:100%;border:none;display:block';
+  f.style.cssText='width:100%;height:100%;border:none;display:block;overflow:hidden';
   frame.appendChild(f);
   $('vSt').textContent='on';$('vSt').className='pill active';
-  toast('Connecting...','info');
+  toast(lang==='en'?'Connecting...':'连接中...','info');
 }
 function vncOff(){
-  $('vf').innerHTML='<div class="vnc-placeholder">Disconnected</div>';
+  $('vf').innerHTML='<div class="vnc-placeholder">'+(lang==='en'?'Disconnected':'已断开')+'</div>';
   $('vSt').textContent='off';$('vSt').className='pill offline';
 }
 
@@ -235,11 +230,11 @@ async function init(){
     db.channel('a')
       .on('postgres_changes',{event:'*',schema:'public',table:'topup_devices'},function(){fD();st()})
       .on('postgres_changes',{event:'*',schema:'public',table:'topup_sessions'},function(){fS();st()})
-      .on('postgres_changes',{event:'*',schema:'public',table:'topup_purchases'},function(p){fP();st();if(p.eventType==='INSERT')toast('$'+p.new.price_usd+' purchase','info')})
+      .on('postgres_changes',{event:'*',schema:'public',table:'topup_purchases'},function(p){fP();st();if(p.eventType==='INSERT')toast('$'+p.new.price_usd,'info')})
       .on('postgres_changes',{event:'*',schema:'public',table:'topup_queue'},function(){fQ();st()})
       .subscribe();
     $('cD').className='dot';$('cL').textContent='Live';
-    setInterval(uT,1000);toast('Connected','success');
+    setInterval(uT,1000);toast(lang==='en'?'Connected':'已连接','success');
   }catch(e){$('cD').className='dot off';$('cL').textContent='Err';toast(e.message,'error')}
 }
 async function refreshAll(){await Promise.all([fD(),fS(),fP(),fQ()]);st()}
@@ -248,23 +243,22 @@ async function fS(){var r=await db.from('topup_sessions').select('*').eq('status
 async function fP(){var r=await db.from('topup_purchases').select('*').order('created_at',{ascending:false}).limit(30);P=r.data||[];rP()}
 async function fQ(){var r=await db.from('topup_queue').select('*').in('status',['waiting','ready']).order('created_at');Q=r.data||[];rQ()}
 
-function rD(){var t=$('dB');$('dC').textContent=D.length;if(!D.length){t.innerHTML='<tr><td colspan="7" class="empty">No devices.</td></tr>';return}t.innerHTML=D.map(function(d){return'<tr><td><strong>'+d.id+'</strong><div class="dim" style="font-size:8px">'+d.ip+'</div></td><td><span class="pill '+d.status+'"><span class="pd"></span>'+d.status+'</span></td><td>'+d.game+'</td><td>$<input class="bi" type="number" step="0.01" value="'+(d.apple_balance||0)+'" onchange="uB(\''+d.id+'\',this.value)"/></td><td>'+(d.assigned_customer?'<span style="color:var(--yel)">'+d.assigned_customer+'</span>':'<span class="dim">-</span>')+'</td><td class="mono dim">'+(d.last_heartbeat?ago(d.last_heartbeat):'-')+'</td><td><div class="bg">'+(d.status==='busy'?'<button class="btn danger" onclick="ff(\''+d.id+'\')">Free</button>':'')+(d.status!=='offline'?'<button class="btn" onclick="tO(\''+d.id+'\',true)">Off</button>':'<button class="btn primary" onclick="tO(\''+d.id+'\',false)">On</button>')+'</div></td></tr>'}).join('')}
-function rS(){var t=$('seB');$('seC').textContent=S.length;if(!S.length){t.innerHTML='<tr><td colspan="6" class="empty">No sessions</td></tr>';return}t.innerHTML=S.map(function(s){var c=(s.credits_allocated-s.credits_spent).toFixed(2);return'<tr><td><strong>'+s.customer_id+'</strong></td><td>'+s.device_id+'</td><td class="mono tm" data-e="'+s.expires_at+'">'+tl(s.expires_at)+'</td><td><span style="color:var(--grn)">$'+c+'</span><span class="dim">/$'+s.credits_allocated+'</span></td><td>'+s.purchases+'</td><td><button class="btn danger" onclick="eS(\''+s.id+'\',\''+s.device_id+'\')">End</button></td></tr>'}).join('')}
-function rP(){var t=$('pB');var td=new Date().toISOString().split('T')[0];var tp=P.filter(function(p){return p.created_at&&p.created_at.startsWith(td)});$('pC').textContent=tp.length+' today';if(!P.length){t.innerHTML='<tr><td colspan="6" class="empty">No purchases</td></tr>';return}t.innerHTML=P.map(function(p){return'<tr><td class="mono dim">'+ft(p.created_at)+'</td><td>'+p.customer_id+'</td><td>'+(p.device_id||'-')+'</td><td>'+p.pack_name+'</td><td><strong>$'+Number(p.price_usd).toFixed(2)+'</strong></td><td><span class="pill '+p.status+'">'+p.status+'</span></td></tr>'}).join('')}
-function rQ(){var t=$('qB');var w=Q.filter(function(q){return q.status==='waiting'}).length;$('qC').textContent=w;if(!Q.length){t.innerHTML='<tr><td colspan="5" class="empty">Empty</td></tr>';return}t.innerHTML=Q.map(function(q,i){return'<tr><td class="mono">'+(i+1)+'</td><td>'+q.customer_id+'</td><td>'+q.game+'</td><td class="mono dim">'+ago(q.created_at)+'</td><td><button class="btn danger" onclick="cQ(\''+q.id+'\')">X</button></td></tr>'}).join('')}
-function st(){var on=D.filter(function(d){return d.status!=='offline'}).length;var fr=D.filter(function(d){return d.status==='free'}).length;var bal=D.reduce(function(s,d){return s+Number(d.apple_balance||0)},0);var td=new Date().toISOString().split('T')[0];var tp=P.filter(function(p){return p.created_at&&p.created_at.startsWith(td)});var rev=tp.reduce(function(s,p){return s+Number(p.price_usd||0)},0);var wc=Q.filter(function(q){return q.status==='waiting'}).length;$('sOn').textContent=on;$('sOnS').textContent=fr+' free';$('sSe').textContent=S.length;$('sSeS').textContent=S.length?'active':'';$('sQ').textContent=wc;$('sQS').textContent=wc?'wait':'';$('sP').textContent=tp.length;$('sPS').textContent='$'+rev.toFixed(0);$('sB').textContent='$'+bal.toFixed(0)}
+function rD(){var t=$('dB');$('dC').textContent=D.length;if(!D.length){t.innerHTML='<tr><td colspan="7" class="empty">'+(lang==='en'?'No devices.':'无设备')+'</td></tr>';return}t.innerHTML=D.map(function(d){return'<tr><td><strong>'+d.id+'</strong><div class="dim" style="font-size:8px">'+d.ip+'</div></td><td><span class="pill '+d.status+'"><span class="pd"></span>'+d.status+'</span></td><td>'+d.game+'</td><td>$<input class="bi" type="number" step="0.01" value="'+(d.apple_balance||0)+'" onchange="uB(\''+d.id+'\',this.value)"/></td><td>'+(d.assigned_customer?'<span style="color:var(--yel)">'+d.assigned_customer+'</span>':'<span class="dim">-</span>')+'</td><td class="mono dim">'+(d.last_heartbeat?ago(d.last_heartbeat):'-')+'</td><td><div class="bg">'+(d.status==='busy'?'<button class="btn danger" onclick="ff(\''+d.id+'\')">Free</button>':'')+(d.status!=='offline'?'<button class="btn" onclick="tO(\''+d.id+'\',true)">Off</button>':'<button class="btn primary" onclick="tO(\''+d.id+'\',false)">On</button>')+'</div></td></tr>'}).join('')}
+function rS(){var t=$('seB');$('seC').textContent=S.length;if(!S.length){t.innerHTML='<tr><td colspan="6" class="empty">'+(lang==='en'?'No sessions':'无会话')+'</td></tr>';return}t.innerHTML=S.map(function(s){var c=(s.credits_allocated-s.credits_spent).toFixed(2);return'<tr><td><strong>'+s.customer_id+'</strong></td><td>'+s.device_id+'</td><td class="mono tm" data-e="'+s.expires_at+'">'+tl(s.expires_at)+'</td><td><span style="color:var(--grn)">$'+c+'</span><span class="dim">/$'+s.credits_allocated+'</span></td><td>'+s.purchases+'</td><td><button class="btn danger" onclick="eS(\''+s.id+'\',\''+s.device_id+'\')">'+(lang==='en'?'End':'结束')+'</button></td></tr>'}).join('')}
+function rP(){var t=$('pB');var td=new Date().toISOString().split('T')[0];var tp=P.filter(function(p){return p.created_at&&p.created_at.startsWith(td)});$('pC').textContent=tp.length+(lang==='en'?' today':' 今天');if(!P.length){t.innerHTML='<tr><td colspan="6" class="empty">'+(lang==='en'?'No purchases':'无购买记录')+'</td></tr>';return}t.innerHTML=P.map(function(p){return'<tr><td class="mono dim">'+ft(p.created_at)+'</td><td>'+p.customer_id+'</td><td>'+(p.device_id||'-')+'</td><td>'+p.pack_name+'</td><td><strong>$'+Number(p.price_usd).toFixed(2)+'</strong></td><td><span class="pill '+p.status+'">'+p.status+'</span></td></tr>'}).join('')}
+function rQ(){var t=$('qB');var w=Q.filter(function(q){return q.status==='waiting'}).length;$('qC').textContent=w;if(!Q.length){t.innerHTML='<tr><td colspan="5" class="empty">'+(lang==='en'?'Empty':'空')+'</td></tr>';return}t.innerHTML=Q.map(function(q,i){return'<tr><td class="mono">'+(i+1)+'</td><td>'+q.customer_id+'</td><td>'+q.game+'</td><td class="mono dim">'+ago(q.created_at)+'</td><td><button class="btn danger" onclick="cQ(\''+q.id+'\')">X</button></td></tr>'}).join('')}
+function st(){var on=D.filter(function(d){return d.status!=='offline'}).length;var fr=D.filter(function(d){return d.status==='free'}).length;var bal=D.reduce(function(s,d){return s+Number(d.apple_balance||0)},0);var td=new Date().toISOString().split('T')[0];var tp=P.filter(function(p){return p.created_at&&p.created_at.startsWith(td)});var rev=tp.reduce(function(s,p){return s+Number(p.price_usd||0)},0);var wc=Q.filter(function(q){return q.status==='waiting'}).length;$('sOn').textContent=on;$('sOnS').textContent=fr+(lang==='en'?' free':' 空闲');$('sSe').textContent=S.length;$('sSeS').textContent=S.length?(lang==='en'?'active':'活跃'):'';$('sQ').textContent=wc;$('sQS').textContent=wc?(lang==='en'?'wait':'等待'):'';$('sP').textContent=tp.length;$('sPS').textContent='$'+rev.toFixed(0);$('sB').textContent='$'+bal.toFixed(0)}
 
 // Sim
 function sl(m,c){var l=$('sL');l.innerHTML+='\n<span class="'+(c||'')+'">['+new Date().toLocaleTimeString('en-US',{hour12:false}).slice(0,5)+'] '+m+'</span>';l.scrollTop=l.scrollHeight}
-async function simStart(){var ci=$('simC').value.trim(),gm=$('simG').value,cr=parseFloat($('simCr').value)||50;if(!ci){sl('Need ID','err');return}if(cr<5){sl('Min $5','err');return}if(sim){sl('End first','err');return}await fD();sl(ci+' | '+gm+' | $'+cr,'info');var fd=D.find(function(d){return d.status==='free'&&d.game===gm});if(!fd){var any=D.find(function(d){return d.game===gm});sl(any?any.id+' is "'+any.status+'"':'No '+gm+' device','err');return}var now=new Date(),exp=new Date(now.getTime()+1800000);var res=await db.from('topup_sessions').insert({customer_id:ci,device_id:fd.id,game:gm,credits_allocated:cr,credits_spent:0,purchases:0,started_at:now.toISOString(),expires_at:exp.toISOString(),status:'active'}).select().single();if(res.error){sl(res.error.message,'err');return}await db.from('topup_devices').update({status:'busy',assigned_customer:ci,assigned_session:res.data.id}).eq('id',fd.id);sim={id:res.data.id,did:fd.id,ci:ci,al:cr,sp:0,n:0};sl('Started '+fd.id+' | $'+cr,'ok')}
-async function simPurchase(){if(!sim){sl('Start first','err');return}var pr=[0.99,1.99,2.99,4.99,9.99,14.99,19.99,49.99];var pk=['Mini','Starter','Value','Growth','Elite','Mega','Diamond','Whale'];var i=Math.floor(Math.random()*pr.length),price=pr[i],pack=pk[i]+' Pack';var ns=sim.sp+price;if(ns>sim.al){sl('$'+price+' > $'+(sim.al-sim.sp).toFixed(2)+' left','err');return}await db.from('topup_purchases').insert({session_id:sim.id,customer_id:sim.ci,device_id:sim.did,pack_name:pack,price_usd:price,status:'confirmed'});sim.sp=ns;sim.n++;await db.from('topup_sessions').update({credits_spent:ns,purchases:sim.n}).eq('id',sim.id);var dv=D.find(function(d){return d.id===sim.did});if(dv)await db.from('topup_devices').update({apple_balance:Math.max(0,Number(dv.apple_balance||0)-price)}).eq('id',dv.id);sl(pack+' $'+price+' | $'+(sim.al-ns).toFixed(2)+' left','ok')}
-async function simEnd(){if(!sim){sl('No session','err');return}await db.from('topup_sessions').update({status:'ended',ended_at:new Date().toISOString()}).eq('id',sim.id);await db.from('topup_devices').update({status:'free',assigned_customer:null,assigned_session:null}).eq('id',sim.did);sl(sim.n+' buys $'+sim.sp.toFixed(2),'ok');sim=null}
+async function simStart(){var ci=$('simC').value.trim(),gm=$('simG').value,cr=parseFloat($('simCr').value)||50;if(!ci){sl(lang==='en'?'Need ID':'需要ID','err');return}if(cr<5){sl('Min $5','err');return}if(sim){sl(lang==='en'?'End first':'先结束','err');return}await fD();sl(ci+' | '+gm+' | $'+cr,'info');var fd=D.find(function(d){return d.status==='free'&&d.game===gm});if(!fd){var any=D.find(function(d){return d.game===gm});sl(any?any.id+' "'+any.status+'"':(lang==='en'?'No device':'无设备'),'err');return}var now=new Date(),exp=new Date(now.getTime()+1800000);var res=await db.from('topup_sessions').insert({customer_id:ci,device_id:fd.id,game:gm,credits_allocated:cr,credits_spent:0,purchases:0,started_at:now.toISOString(),expires_at:exp.toISOString(),status:'active'}).select().single();if(res.error){sl(res.error.message,'err');return}await db.from('topup_devices').update({status:'busy',assigned_customer:ci,assigned_session:res.data.id}).eq('id',fd.id);sim={id:res.data.id,did:fd.id,ci:ci,al:cr,sp:0,n:0};sl((lang==='en'?'Started':'已开始')+' '+fd.id+' | $'+cr,'ok')}
+async function simPurchase(){if(!sim){sl(lang==='en'?'Start first':'先开始','err');return}var pr=[0.99,1.99,2.99,4.99,9.99,14.99,19.99,49.99];var pk=['Mini','Starter','Value','Growth','Elite','Mega','Diamond','Whale'];var i=Math.floor(Math.random()*pr.length),price=pr[i],pack=pk[i]+' Pack';var ns=sim.sp+price;if(ns>sim.al){sl('$'+price+' > $'+(sim.al-sim.sp).toFixed(2),'err');return}await db.from('topup_purchases').insert({session_id:sim.id,customer_id:sim.ci,device_id:sim.did,pack_name:pack,price_usd:price,status:'confirmed'});sim.sp=ns;sim.n++;await db.from('topup_sessions').update({credits_spent:ns,purchases:sim.n}).eq('id',sim.id);var dv=D.find(function(d){return d.id===sim.did});if(dv)await db.from('topup_devices').update({apple_balance:Math.max(0,Number(dv.apple_balance||0)-price)}).eq('id',dv.id);sl(pack+' $'+price+' | $'+(sim.al-ns).toFixed(2),'ok')}
+async function simEnd(){if(!sim){sl(lang==='en'?'No session':'无会话','err');return}await db.from('topup_sessions').update({status:'ended',ended_at:new Date().toISOString()}).eq('id',sim.id);await db.from('topup_devices').update({status:'free',assigned_customer:null,assigned_session:null}).eq('id',sim.did);sl(sim.n+(lang==='en'?' buys $':' 次 $')+sim.sp.toFixed(2),'ok');sim=null}
 
-// Admin
-async function uB(id,v){await db.from('topup_devices').update({apple_balance:parseFloat(v)||0}).eq('id',id);toast('Updated','success')}
+async function uB(id,v){await db.from('topup_devices').update({apple_balance:parseFloat(v)||0}).eq('id',id);toast('OK','success')}
 async function tO(id,off){await db.from('topup_devices').update(off?{status:'offline',vnc_active:false}:{status:'free',vnc_active:true}).eq('id',id);toast(id+' '+(off?'off':'on'),'success')}
-async function ff(id){await db.from('topup_devices').update({status:'free',assigned_customer:null,assigned_session:null}).eq('id',id);await db.from('topup_sessions').update({status:'ended',ended_at:new Date().toISOString()}).eq('device_id',id).eq('status','active');sim=null;toast('Freed','success')}
-async function eS(sid,did){await db.from('topup_sessions').update({status:'ended',ended_at:new Date().toISOString()}).eq('id',sid);await db.from('topup_devices').update({status:'free',assigned_customer:null,assigned_session:null}).eq('id',did);if(sim&&sim.id===sid)sim=null;toast('Ended','success')}
+async function ff(id){await db.from('topup_devices').update({status:'free',assigned_customer:null,assigned_session:null}).eq('id',id);await db.from('topup_sessions').update({status:'ended',ended_at:new Date().toISOString()}).eq('device_id',id).eq('status','active');sim=null;toast('OK','success')}
+async function eS(sid,did){await db.from('topup_sessions').update({status:'ended',ended_at:new Date().toISOString()}).eq('id',sid);await db.from('topup_devices').update({status:'free',assigned_customer:null,assigned_session:null}).eq('id',did);if(sim&&sim.id===sid)sim=null;toast('OK','success')}
 async function cQ(id){await db.from('topup_queue').update({status:'cancelled'}).eq('id',id)}
 
 function ago(ts){if(!ts)return'-';var d=Date.now()-new Date(ts).getTime(),s=Math.floor(d/1000);if(s<5)return'now';if(s<60)return s+'s';var m=Math.floor(s/60);if(m<60)return m+'m';var h=Math.floor(m/60);return h<24?h+'h':Math.floor(h/24)+'d'}
