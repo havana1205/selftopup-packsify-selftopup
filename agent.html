@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Packsify Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0e1f;--card:#111627;--blue:#81adf3;--navy:#232e55;--grn:#00c853;--red:#e8506a;--yel:#ffc701;--txt:#e0e6f0;--dim:#6a7d94;--brd:rgba(129,173,243,.1)}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+
+.top{background:linear-gradient(135deg,var(--navy),#1e1f7e);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.top-logo{font-size:18px;font-weight:800;color:var(--blue)}
+.top-logo span{font-weight:400;font-size:11px;color:rgba(255,255,255,.35);margin-left:4px}
+.lang{font-family:'Outfit';font-size:10px;font-weight:600;padding:4px 10px;border-radius:12px;border:1px solid var(--brd);background:rgba(255,255,255,.04);color:var(--dim);cursor:pointer}
+
+.wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px}
+
+/* Pairing screen */
+.pair-box{width:100%;max-width:340px;text-align:center}
+.pair-icon{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,rgba(129,173,243,.15),rgba(129,173,243,.06));border:1px solid rgba(129,173,243,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.pair-icon svg{width:28px;height:28px}
+.pair-title{font-size:20px;font-weight:700;color:#fff;margin-bottom:4px}
+.pair-sub{font-size:13px;color:var(--dim);margin-bottom:24px;line-height:1.5}
+.code-input{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
+.code-input input{width:44px;height:56px;text-align:center;font-family:'Outfit';font-size:24px;font-weight:700;color:#fff;background:rgba(255,255,255,.06);border:2px solid var(--brd);border-radius:10px;outline:none;caret-color:var(--blue)}
+.code-input input:focus{border-color:var(--blue);background:rgba(129,173,243,.08)}
+.pair-btn{width:100%;font-family:'Outfit';font-size:14px;font-weight:600;padding:14px;border-radius:10px;border:none;cursor:pointer;transition:all .2s}
+.pair-btn.primary{background:linear-gradient(135deg,#81adf3,#4a68ce);color:#fff}
+.pair-btn.primary:disabled{opacity:.4;cursor:default}
+.pair-btn.primary:active:not(:disabled){transform:scale(.97)}
+.pair-err{color:var(--red);font-size:12px;margin-bottom:12px;min-height:18px}
+
+/* Connected screen */
+.conn-box{width:100%;max-width:340px;text-align:center}
+.conn-icon{width:80px;height:80px;border-radius:20px;background:rgba(0,200,83,.1);border:2px solid rgba(0,200,83,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.conn-icon svg{width:36px;height:36px}
+.conn-title{font-size:22px;font-weight:700;color:#fff;margin-bottom:4px}
+.conn-sub{font-size:13px;color:var(--dim);margin-bottom:20px}
+.conn-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.conn-stat{background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:12px}
+.conn-stat-l{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);margin-bottom:2px}
+.conn-stat-v{font-size:18px;font-weight:700}
+.pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--grn);margin-right:6px;animation:pu 2s infinite}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
+.conn-info{background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:14px;text-align:left;margin-bottom:16px}
+.conn-info-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px}
+.conn-info-row span:first-child{color:var(--dim)}
+.conn-info-row span:last-child{color:#fff;font-weight:500}
+.disconnect-btn{width:100%;font-family:'Outfit';font-size:13px;font-weight:600;padding:12px;border-radius:10px;border:1px solid rgba(232,80,106,.3);background:rgba(232,80,106,.08);color:var(--red);cursor:pointer}
+.disconnect-btn:active{background:rgba(232,80,106,.15)}
+
+/* Keep alive warning */
+.keep-alive{background:rgba(255,199,1,.08);border:1px solid rgba(255,199,1,.2);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--yel);margin-top:12px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="top-logo">PACKSIFY <span>Agent</span></div>
+  <button class="lang" onclick="toggleLang()" id="langBtn">中文</button>
+</div>
+
+<div class="wrap">
+  <!-- PAIR VIEW -->
+  <div class="pair-box" id="vPair">
+    <div class="pair-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#81adf3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+    </div>
+    <div class="pair-title" id="pairTitle">Connect your device</div>
+    <div class="pair-sub" id="pairSub">Enter the 6-digit pairing code from the Packsify Supplier Portal</div>
+    <div class="code-input" id="codeInputs">
+      <input type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off"/>
+      <input type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off"/>
+      <input type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off"/>
+      <input type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off"/>
+      <input type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off"/>
+      <input type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off"/>
+    </div>
+    <div class="pair-err" id="pairErr"></div>
+    <button class="pair-btn primary" id="pairBtn" onclick="doPair()" disabled>Connect</button>
+  </div>
+
+  <!-- CONNECTED VIEW -->
+  <div class="conn-box" id="vConn" style="display:none">
+    <div class="conn-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#00c853" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    </div>
+    <div class="conn-title" id="connTitle">Connected</div>
+    <div class="conn-sub" id="connSub">Device is registered and sending heartbeats</div>
+    <div class="conn-stats">
+      <div class="conn-stat">
+        <div class="conn-stat-l" id="statUpL">Uptime</div>
+        <div class="conn-stat-v" style="color:var(--blue)" id="statUp">0:00</div>
+      </div>
+      <div class="conn-stat">
+        <div class="conn-stat-l" id="statHbL">Heartbeats</div>
+        <div class="conn-stat-v" style="color:var(--grn)" id="statHb">0</div>
+      </div>
+    </div>
+    <div class="conn-info">
+      <div class="conn-info-row"><span id="infoStatusL">Status</span><span><span class="pulse"></span><span id="infoStatus">Online</span></span></div>
+      <div class="conn-info-row"><span id="infoDevL">Device</span><span id="infoDev">-</span></div>
+      <div class="conn-info-row"><span id="infoGameL">Game</span><span id="infoGame">-</span></div>
+      <div class="conn-info-row"><span id="infoSupL">Supplier</span><span id="infoSup">-</span></div>
+      <div class="conn-info-row"><span id="infoIpL">IP</span><span id="infoIp">-</span></div>
+    </div>
+    <div class="keep-alive" id="keepAlive">Keep this tab open. The device stays connected as long as Safari is running.</div>
+    <button class="disconnect-btn" onclick="doDisconnect()" id="discBtn" style="margin-top:12px">Disconnect</button>
+  </div>
+</div>
+
+<script>
+var db=window.supabase.createClient('https://tewircokuexllpzmrapz.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRld2lyY29rdWV4bGxwem1yYXB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MjI3NzMsImV4cCI6MjA5MDE5ODc3M30.6JaFXJwq1CQx8u4HPfAYSkLFSDSSTEcAJeF_4YFCRKY');
+var lang='en',device=null,hbCount=0,startTime=null,hbInterval=null,uptimeInterval=null;
+var $=function(id){return document.getElementById(id)};
+
+var T={
+  en:{pairTitle:'Connect your device',pairSub:'Enter the 6-digit pairing code from the Packsify Supplier Portal',connect:'Connect',connTitle:'Connected',connSub:'Device is registered and sending heartbeats',uptime:'Uptime',heartbeats:'Heartbeats',status:'Status',device:'Device',game:'Game',supplier:'Supplier',ip:'IP',online:'Online',offline:'Offline',disconnect:'Disconnect',keepAlive:'Keep this tab open. The device stays connected as long as Safari is running.',errInvalid:'Invalid code. Check and try again.',errExpired:'Code expired. Generate a new one from the portal.',errNotFound:'Code not found. Please check the code.',connecting:'Connecting...'},
+  zh:{pairTitle:'连接您的设备',pairSub:'输入Packsify供应商门户的6位配对码',connect:'连接',connTitle:'已连接',connSub:'设备已注册并正在发送心跳',uptime:'运行时间',heartbeats:'心跳',status:'状态',device:'设备',game:'游戏',supplier:'供应商',ip:'IP',online:'在线',offline:'离线',disconnect:'断开连接',keepAlive:'请保持此标签页打开。设备将在Safari运行期间保持连接。',errInvalid:'配对码无效，请检查后重试。',errExpired:'配对码已过期，请从门户生成新的。',errNotFound:'未找到配对码，请检查。',connecting:'连接中...'}
+};
+function t(k){return T[lang][k]||k}
+
+function toggleLang(){
+  lang=lang==='en'?'zh':'en';
+  $('langBtn').textContent=lang==='en'?'中文':'EN';
+  updateTexts();
+}
+
+function updateTexts(){
+  $('pairTitle').textContent=t('pairTitle');
+  $('pairSub').textContent=t('pairSub');
+  $('pairBtn').textContent=t('connect');
+  $('connTitle').textContent=t('connTitle');
+  $('connSub').textContent=t('connSub');
+  $('statUpL').textContent=t('uptime');
+  $('statHbL').textContent=t('heartbeats');
+  $('infoStatusL').textContent=t('status');
+  $('infoStatus').textContent=t('online');
+  $('infoDevL').textContent=t('device');
+  $('infoGameL').textContent=t('game');
+  $('infoSupL').textContent=t('supplier');
+  $('infoIpL').textContent=t('ip');
+  $('keepAlive').textContent=t('keepAlive');
+  $('discBtn').textContent=t('disconnect');
+}
+
+// Code input handling
+(function(){
+  var inputs=document.querySelectorAll('.code-input input');
+  inputs.forEach(function(inp,i){
+    inp.addEventListener('input',function(){
+      if(inp.value.length===1&&i<5)inputs[i+1].focus();
+      checkCode();
+    });
+    inp.addEventListener('keydown',function(e){
+      if(e.key==='Backspace'&&!inp.value&&i>0){inputs[i-1].focus();inputs[i-1].value=''}
+    });
+    inp.addEventListener('paste',function(e){
+      e.preventDefault();
+      var paste=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+      for(var j=0;j<paste.length&&j<6;j++){inputs[j].value=paste[j]}
+      if(paste.length>0)inputs[Math.min(paste.length,5)].focus();
+      checkCode();
+    });
+  });
+})();
+
+function getCode(){
+  var inputs=document.querySelectorAll('.code-input input');
+  var code='';
+  inputs.forEach(function(inp){code+=inp.value});
+  return code;
+}
+
+function checkCode(){
+  var code=getCode();
+  $('pairBtn').disabled=code.length!==6;
+}
+
+async function getLocalIP(){
+  try{
+    var pc=new RTCPeerConnection({iceServers:[]});
+    pc.createDataChannel('');
+    var offer=await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    return new Promise(function(resolve){
+      pc.onicecandidate=function(e){
+        if(!e||!e.candidate)return;
+        var m=e.candidate.candidate.match(/([0-9]{1,3}\.){3}[0-9]{1,3}/);
+        if(m){pc.close();resolve(m[0])}
+      };
+      setTimeout(function(){pc.close();resolve('unknown')},2000);
+    });
+  }catch(e){return'unknown'}
+}
+
+async function doPair(){
+  var code=getCode();
+  if(code.length!==6)return;
+  $('pairErr').textContent='';
+  $('pairBtn').textContent=t('connecting');
+  $('pairBtn').disabled=true;
+
+  // Look up pairing code
+  var res=await db.from('pairing_codes').select('*').eq('code',code).eq('status','pending').single();
+  if(res.error||!res.data){
+    // Check if expired
+    var exp=await db.from('pairing_codes').select('*').eq('code',code).single();
+    if(exp.data&&exp.data.status==='expired'){
+      $('pairErr').textContent=t('errExpired');
+    }else if(exp.data&&exp.data.status==='paired'){
+      $('pairErr').textContent=t('errInvalid');
+    }else{
+      $('pairErr').textContent=t('errNotFound');
+    }
+    $('pairBtn').textContent=t('connect');
+    $('pairBtn').disabled=false;
+    return;
+  }
+
+  var pc=res.data;
+  var ip=await getLocalIP();
+  var deviceId='dev-'+code+'-'+Date.now().toString(36);
+
+  // Create device in topup_devices
+  var devRes=await db.from('topup_devices').insert({
+    id:deviceId,
+    ip:ip,
+    vnc_port:5900,
+    status:'free',
+    game:pc.game||'kingshot',
+    apple_balance:0,
+    vnc_active:true,
+    supplier_id:pc.supplier_id,
+    device_name:pc.device_name||('Device '+code),
+    last_heartbeat:new Date().toISOString()
+  }).select().single();
+
+  if(devRes.error){
+    $('pairErr').textContent=devRes.error.message;
+    $('pairBtn').textContent=t('connect');
+    $('pairBtn').disabled=false;
+    return;
+  }
+
+  // Update pairing code to paired
+  await db.from('pairing_codes').update({
+    status:'paired',
+    paired_device_id:deviceId,
+    paired_at:new Date().toISOString()
+  }).eq('id',pc.id);
+
+  // Update supplier devices count
+  await db.from('suppliers').update({
+    devices_count:db.rpc?undefined:undefined,
+    last_active_at:new Date().toISOString()
+  }).eq('id',pc.supplier_id);
+
+  // Get supplier name
+  var sup=await db.from('suppliers').select('name').eq('id',pc.supplier_id).single();
+
+  device={id:deviceId,name:pc.device_name||deviceId,game:pc.game,supplier:sup.data?sup.data.name:'',ip:ip};
+
+  // Show connected view
+  $('vPair').style.display='none';
+  $('vConn').style.display='block';
+  $('infoDev').textContent=device.name;
+  $('infoGame').textContent=device.game;
+  $('infoSup').textContent=device.supplier;
+  $('infoIp').textContent=device.ip;
+
+  // Start heartbeat
+  startTime=Date.now();
+  hbCount=0;
+  sendHeartbeat();
+  hbInterval=setInterval(sendHeartbeat,30000);
+  uptimeInterval=setInterval(updateUptime,1000);
+}
+
+async function sendHeartbeat(){
+  if(!device)return;
+  hbCount++;
+  $('statHb').textContent=hbCount;
+  await db.from('topup_devices').update({
+    last_heartbeat:new Date().toISOString(),
+    vnc_active:true,
+    status:'free'
+  }).eq('id',device.id);
+}
+
+function updateUptime(){
+  if(!startTime)return;
+  var d=Math.floor((Date.now()-startTime)/1000);
+  var h=Math.floor(d/3600);
+  var m=Math.floor((d%3600)/60);
+  var s=d%60;
+  $('statUp').textContent=(h?h+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+async function doDisconnect(){
+  if(!device)return;
+  clearInterval(hbInterval);
+  clearInterval(uptimeInterval);
+  await db.from('topup_devices').update({
+    status:'offline',
+    vnc_active:false
+  }).eq('id',device.id);
+  device=null;
+  hbCount=0;startTime=null;
+  $('vConn').style.display='none';
+  $('vPair').style.display='block';
+  // Clear code inputs
+  document.querySelectorAll('.code-input input').forEach(function(inp){inp.value=''});
+  $('pairBtn').disabled=true;
+  $('pairBtn').textContent=t('connect');
+}
+
+// Mark offline on page unload
+window.addEventListener('beforeunload',function(){
+  if(device){
+    navigator.sendBeacon(
+      'https://tewircokuexllpzmrapz.supabase.co/rest/v1/topup_devices?id=eq.'+device.id,
+      ''
+    );
+  }
+});
+
+// Prevent screen sleep (keeps the page active)
+var wakeLock=null;
+async function requestWakeLock(){
+  try{
+    if('wakeLock' in navigator){
+      wakeLock=await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release',function(){
+        setTimeout(requestWakeLock,1000);
+      });
+    }
+  }catch(e){}
+}
+requestWakeLock();
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible')requestWakeLock();
+});
+</script>
+</body>
+</html>
