@@ -3,270 +3,459 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Packsify Self Top-Up Admin</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Packsify Self Top-Up</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--blue:#81adf3;--navy:#232e55;--dn:#1e1f7e;--bg:#0a0e1f;--card:#111627;--brd:rgba(129,173,243,.1);--brd2:rgba(129,173,243,.2);--grn:#00c853;--grnd:rgba(0,200,83,.15);--yel:#ffc701;--yeld:rgba(255,199,1,.12);--red:#e8506a;--redd:rgba(232,80,106,.12);--txt:#e0e6f0;--dim:#6a7d94;--wh:#fff}
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:#0a0e1f;color:#e0e6f0;min-height:100vh}
+a{color:#81adf3;text-decoration:none}
 
 /* Header */
-.hdr{background:linear-gradient(135deg,var(--navy),var(--dn));border-bottom:1px solid var(--brd);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;gap:8px}
-.logo{font-size:17px;font-weight:800;color:var(--blue);white-space:nowrap}.logo span{color:var(--wh);font-weight:400;font-size:11px;margin-left:5px;opacity:.5}
-.hdr-r{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.conn{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:500;color:var(--dim);background:rgba(255,255,255,.04);border:1px solid var(--brd);border-radius:14px;padding:3px 8px}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--grn);flex-shrink:0}.dot.off{background:var(--red)}
-.lang-btn{font-family:'Outfit',sans-serif;font-size:10px;font-weight:600;padding:3px 8px;border-radius:14px;border:1px solid var(--brd);background:rgba(255,255,255,.04);color:var(--dim);cursor:pointer}
-.lang-btn:hover{color:var(--blue);border-color:var(--brd2)}
+.hdr{background:linear-gradient(135deg,#232e55,#1e1f7e);border-bottom:1px solid rgba(129,173,243,.1);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.logo{font-size:18px;font-weight:800;color:#81adf3}
+.logo-sub{font-size:11px;color:rgba(255,255,255,.35)}
+.hdr-r{display:flex;gap:6px;align-items:center}
+.hdr-user{font-size:11px;color:#6a7d94;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ibtn{font-family:'Outfit';font-size:10px;font-weight:600;padding:4px 10px;border-radius:12px;border:1px solid rgba(129,173,243,.15);background:rgba(255,255,255,.04);color:#6a7d94;cursor:pointer}
+.ibtn:hover{color:#e0e6f0;background:rgba(255,255,255,.08)}
 
-.pg{padding:14px;max-width:1600px;margin:0 auto}
+/* Nav tabs */
+.nav{display:flex;gap:2px;padding:8px 16px;background:rgba(0,0,0,.2);border-bottom:1px solid rgba(129,173,243,.06)}
+.nav button{font-family:'Outfit';font-size:12px;font-weight:600;padding:8px 16px;border:none;border-radius:8px;cursor:pointer;color:#6a7d94;background:transparent;transition:all .15s}
+.nav button.on{color:#81adf3;background:rgba(129,173,243,.1)}
+.nav button:hover:not(.on){color:#e0e6f0}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;font-size:9px;font-weight:700;border-radius:8px;background:rgba(129,173,243,.2);color:#81adf3;margin-left:4px;padding:0 4px}
 
-/* Desktop layout */
-.main-grid{display:grid;grid-template-columns:300px 1fr;gap:14px;margin-bottom:14px;align-items:start}
+.pg{padding:16px;max-width:1400px;margin:0 auto}
+.hide{display:none}
 
-/* VNC */
-.vnc-panel{background:var(--card);border:1px solid var(--brd2);border-radius:14px;padding:10px}
-.vnc-panel h3{font-size:12px;font-weight:700;color:var(--wh);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
-.vnc-panel h3 .pill{font-size:8px}
-.vnc-frame{width:276px;height:560px;margin:0 auto;background:#000;border-radius:16px;overflow:hidden;border:2px solid #1e2233}
-.vnc-frame iframe{width:100%;height:100%;border:none;display:block;overflow:hidden}
-.vnc-placeholder{display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:10px;text-align:center;padding:16px}
-.vnc-ctrl{display:flex;gap:5px;margin-top:8px}.vnc-ctrl .btn{flex:1;text-align:center}
+/* Cards */
+.card{background:#111627;border:1px solid rgba(129,173,243,.12);border-radius:12px;padding:16px;margin-bottom:12px}
+.card-t{font-size:14px;font-weight:700;color:#fff;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
 
-/* Right */
-.right-panel{display:flex;flex-direction:column;gap:12px;min-width:0}
-.sim{background:linear-gradient(135deg,rgba(129,173,243,.06),rgba(161,72,251,.04));border:1px solid var(--brd2);border-radius:10px;padding:12px 14px}
-.sim-t{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px}
-.sim-row{display:flex;gap:6px;align-items:end;flex-wrap:wrap}
-.sim-field label{display:block;font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--dim);margin-bottom:2px}
-.sim-field input,.sim-field select{font-family:'Outfit',sans-serif;font-size:11px;padding:4px 7px;background:rgba(255,255,255,.06);border:1px solid var(--brd);border-radius:4px;color:var(--wh);width:88px}
-.sim-field input:focus,.sim-field select:focus{outline:none;border-color:var(--blue)}
-.sim-field select option{background:#1a1d2e}
-.sim-actions{display:flex;gap:4px;align-items:end}
-.sim-log{margin-top:6px;background:rgba(0,0,0,.3);border-radius:5px;padding:6px 8px;max-height:76px;overflow-y:auto;font-size:9px;font-family:'Courier New',monospace;color:var(--dim);line-height:1.5}
-.sim-log .ok{color:var(--grn)}.sim-log .err{color:var(--red)}.sim-log .info{color:var(--blue)}
+/* Stats row */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:6px;margin-bottom:12px}
+.stat{background:#111627;border:1px solid rgba(129,173,243,.1);border-radius:8px;padding:8px 10px}
+.stat-l{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#6a7d94;margin-bottom:1px}
+.stat-v{font-size:20px;font-weight:700;line-height:1}
+.grn{color:#00c853}.yel{color:#ffc701}.blu{color:#81adf3}.red{color:#e8506a}
 
-.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.sc{background:var(--card);border:1px solid var(--brd);border-radius:7px;padding:8px 10px}
-.sc-l{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--dim);margin-bottom:2px}
-.sc-v{font-size:20px;font-weight:700;color:var(--wh);line-height:1}.sc-v.g{color:var(--grn)}.sc-v.y{color:var(--yel)}.sc-v.b{color:var(--blue)}
-.sc-s{font-size:8px;color:var(--dim);margin-top:2px}
+/* Device grid */
+.dev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.dev-card{background:#111627;border:1px solid rgba(129,173,243,.1);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .15s}
+.dev-card:hover{border-color:rgba(129,173,243,.25);transform:translateY(-1px)}
+.dev-card.selected{border-color:#81adf3;box-shadow:0 0 20px rgba(129,173,243,.15)}
+.dev-top{padding:10px 12px;display:flex;align-items:center;justify-content:space-between}
+.dev-name{font-size:13px;font-weight:600;color:#fff}
+.dev-meta{font-size:10px;color:#6a7d94;margin-top:2px}
+.dev-screen{width:100%;aspect-ratio:9/16;background:#000;position:relative;overflow:hidden}
+.dev-screen iframe{width:100%;height:100%;border:none}
+.dev-screen-ph{display:flex;align-items:center;justify-content:center;height:100%;color:#333;font-size:11px}
+.dev-bottom{padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(129,173,243,.06)}
+.dev-bal{font-size:12px;font-weight:600;color:#ffc701}
 
-.sec{}.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
-.st{font-size:12px;font-weight:700;color:var(--wh)}.cnt{font-size:8px;font-weight:600;color:var(--dim);background:rgba(255,255,255,.04);border-radius:5px;padding:2px 6px}
-.tw{background:var(--card);border:1px solid var(--brd);border-radius:7px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap}
-th{text-align:left;padding:6px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--dim);background:rgba(255,255,255,.02);border-bottom:1px solid var(--brd)}
-td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
-tr:last-child td{border-bottom:none}tr:hover td{background:rgba(129,173,243,.03)}
-
-.pill{display:inline-flex;align-items:center;gap:3px;font-size:8px;font-weight:600;padding:2px 6px;border-radius:10px;text-transform:uppercase}
-.pill.free{background:var(--grnd);color:var(--grn)}.pill.busy{background:var(--yeld);color:var(--yel)}.pill.offline{background:var(--redd);color:var(--red)}
-.pill.active{background:var(--grnd);color:var(--grn)}.pill.ended,.pill.cancelled{background:rgba(255,255,255,.06);color:var(--dim)}.pill.expired{background:var(--redd);color:var(--red)}
-.pill.waiting{background:var(--yeld);color:var(--yel)}.pill.confirmed{background:var(--grnd);color:var(--grn)}
-.pd{width:3px;height:3px;border-radius:50%;background:currentColor}.pill.active .pd{animation:pu 2s infinite}
+/* Pills */
+.pill{display:inline-flex;align-items:center;gap:3px;font-size:8px;font-weight:600;padding:2px 7px;border-radius:10px;text-transform:uppercase}
+.pill-g{background:rgba(0,200,83,.12);color:#00c853}
+.pill-y{background:rgba(255,199,1,.1);color:#ffc701}
+.pill-r{background:rgba(232,80,106,.1);color:#e8506a}
+.pill-b{background:rgba(129,173,243,.1);color:#81adf3}
+.pulse{width:5px;height:5px;border-radius:50%;background:currentColor;animation:pu 2s infinite}
 @keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
 
-.btn{font-family:'Outfit',sans-serif;font-size:10px;font-weight:600;padding:4px 9px;border-radius:5px;border:1px solid var(--brd);background:rgba(255,255,255,.04);color:var(--dim);cursor:pointer;transition:all .15s}
-.btn:hover{background:rgba(255,255,255,.08);color:var(--txt)}.btn:active{transform:scale(.96)}
-.btn.danger{border-color:rgba(232,80,106,.3);color:var(--red)}.btn.primary{border-color:rgba(129,173,243,.3);color:var(--blue)}
-.btn.success{border-color:rgba(0,200,83,.3);color:var(--grn)}
-.btn.sm{padding:5px 11px;font-size:11px}.bg{display:flex;gap:3px}
-.bi{width:55px;padding:3px 5px;font-family:'Outfit',sans-serif;font-size:10px;color:var(--wh);background:rgba(255,255,255,.06);border:1px solid var(--brd);border-radius:4px;text-align:right}.bi:focus{outline:none;border-color:var(--blue)}
-.empty{text-align:center;padding:16px 8px;color:var(--dim);font-size:10px}.mono{font-variant-numeric:tabular-nums}.dim{color:var(--dim)}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
-.bottom{margin-top:14px}
+/* VNC Viewer (full screen overlay) */
+.vnc-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:300;display:flex;flex-direction:column}
+.vnc-bar{padding:8px 16px;display:flex;align-items:center;justify-content:space-between;background:rgba(17,22,39,.95);border-bottom:1px solid rgba(129,173,243,.1)}
+.vnc-bar-left{display:flex;align-items:center;gap:10px}
+.vnc-bar-name{font-size:14px;font-weight:600;color:#fff}
+.vnc-bar-meta{font-size:11px;color:#6a7d94}
+.vnc-body{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px}
+.vnc-frame{width:100%;max-width:400px;height:100%;max-height:calc(100vh - 60px);background:#000;border-radius:12px;overflow:hidden}
+.vnc-frame iframe{width:100%;height:100%;border:none}
 
-.toasts{position:fixed;bottom:10px;right:10px;z-index:1000;display:flex;flex-direction:column;gap:4px}
-.toast{background:var(--card);border:1px solid var(--brd2);border-radius:7px;padding:8px 14px;font-size:11px;box-shadow:0 6px 24px rgba(0,0,0,.4);animation:si .3s ease;max-width:240px}
-.toast.success{border-left:3px solid var(--grn)}.toast.error{border-left:3px solid var(--red)}.toast.info{border-left:3px solid var(--blue)}
+/* Buttons */
+.btn{font-family:'Outfit';font-size:11px;font-weight:600;padding:6px 14px;border-radius:6px;border:1px solid rgba(129,173,243,.15);background:rgba(255,255,255,.04);color:#6a7d94;cursor:pointer;transition:all .12s}
+.btn:hover{background:rgba(255,255,255,.08);color:#e0e6f0}
+.btn:active{transform:scale(.97)}
+.btn-p{border-color:rgba(129,173,243,.3);background:rgba(129,173,243,.1);color:#81adf3}
+.btn-s{border-color:rgba(0,200,83,.3);color:#00c853}
+.btn-d{border-color:rgba(232,80,106,.3);color:#e8506a}
+.btn-full{width:100%}
+
+/* Forms */
+input,select{width:100%;font-family:'Outfit';font-size:13px;padding:10px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(129,173,243,.1);border-radius:6px;color:#e0e6f0;outline:none;margin-bottom:8px}
+input:focus,select:focus{border-color:#81adf3}
+select option{background:#1a1d2e}
+.form-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#6a7d94;margin-bottom:3px}
+.err{color:#e8506a;font-size:12px;margin:6px 0}
+
+/* Auth */
+.auth-wrap{max-width:360px;margin:60px auto;text-align:center}
+.auth-logo{font-size:32px;font-weight:800;color:#81adf3;margin-bottom:4px}
+.auth-sub{font-size:13px;color:#6a7d94;margin-bottom:24px}
+.auth-tabs{display:flex;border-radius:8px;overflow:hidden;border:1px solid rgba(129,173,243,.12);margin-bottom:16px}
+.auth-tabs button{flex:1;padding:10px;font-family:'Outfit';font-size:13px;font-weight:600;border:none;cursor:pointer;background:transparent;color:#6a7d94}
+.auth-tabs button.on{background:rgba(129,173,243,.1);color:#81adf3}
+
+/* Add device */
+.code-display{font-size:44px;font-weight:800;font-family:monospace;color:#fff;letter-spacing:10px;text-align:center;padding:20px;background:rgba(129,173,243,.06);border-radius:12px;margin:10px 0}
+.steps{background:rgba(129,173,243,.05);border-radius:8px;padding:12px 14px;font-size:12px;color:#6a7d94;line-height:2;margin-bottom:12px}
+
+/* Tables */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap}
+th{text-align:left;padding:6px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#6a7d94;background:rgba(255,255,255,.02);border-bottom:1px solid rgba(129,173,243,.08)}
+td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.03)}
+tr:hover td{background:rgba(129,173,243,.03)}
+.dim{color:#6a7d94}
+.mono{font-variant-numeric:tabular-nums}
+
+/* Toast */
+.toasts{position:fixed;bottom:10px;right:10px;z-index:500;display:flex;flex-direction:column;gap:4px}
+.toast{background:#111627;border:1px solid rgba(129,173,243,.15);border-radius:7px;padding:8px 14px;font-size:11px;box-shadow:0 6px 24px rgba(0,0,0,.4);animation:si .3s ease;max-width:240px}
+.toast.ok{border-left:3px solid #00c853}
+.toast.bad{border-left:3px solid #e8506a}
+.toast.info{border-left:3px solid #81adf3}
 @keyframes si{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
 
-/* Tablet */
-@media(max-width:1024px){
-  .main-grid{grid-template-columns:260px 1fr}
-  .vnc-frame{width:236px;height:480px}
-}
-
-/* Small tablet / large phone */
-@media(max-width:768px){
-  .main-grid{grid-template-columns:1fr}
-  .vnc-panel{order:-1}
-  .vnc-frame{width:100%;max-width:300px;height:560px;margin:0 auto}
+@media(max-width:640px){
+  .pg{padding:10px}
+  .dev-grid{grid-template-columns:1fr}
   .stats{grid-template-columns:repeat(3,1fr)}
-  .g2{grid-template-columns:1fr}
-}
-
-/* Phone */
-@media(max-width:480px){
-  .pg{padding:8px}
-  .hdr{padding:8px 10px}
-  .logo{font-size:15px}
-  .vnc-frame{max-width:100%;height:calc(100vw * 1.85)}
-  .stats{grid-template-columns:repeat(3,1fr);gap:4px}
-  .sc{padding:6px 8px}.sc-v{font-size:17px}
-  .sim-field input,.sim-field select{width:72px;font-size:10px}
-  .sim-row{gap:4px}
-  table{font-size:10px}
-  th,td{padding:5px 6px}
+  .vnc-frame{max-width:100%}
+  .nav{padding:6px 10px;gap:1px}
+  .nav button{padding:6px 10px;font-size:11px}
 }
 </style>
 </head>
 <body>
+
+<!-- HEADER -->
 <div class="hdr">
-  <div class="logo">PACKSIFY <span data-en="Top-Up Admin" data-zh="自助充值管理">Top-Up Admin</span></div>
+  <div class="hdr-left">
+    <div class="logo">PACKSIFY</div>
+    <div class="logo-sub" id="hSub">Self Top-Up</div>
+  </div>
   <div class="hdr-r">
-    <button class="lang-btn" onclick="toggleLang()" id="langBtn">中文</button>
-    <div class="conn"><div class="dot" id="cD"></div><span id="cL">...</span></div>
-    <button class="btn primary" onclick="refreshAll()" data-en="Refresh" data-zh="刷新">Refresh</button>
+    <span class="hdr-user" id="hUser"></span>
+    <button class="ibtn" onclick="toggleLang()" id="langBtn">中文</button>
+    <button class="ibtn hide" id="logoutBtn" onclick="logout()">Logout</button>
   </div>
 </div>
+
+<!-- NAV -->
+<div class="nav hide" id="navBar">
+  <button class="on" onclick="go('devices')" id="navDev">Devices</button>
+  <button onclick="go('add')" id="navAdd">+ Add</button>
+  <button onclick="go('sessions')" id="navSes">Sessions</button>
+  <button onclick="go('purchases')" id="navPur">Purchases</button>
+  <button class="hide" onclick="go('suppliers')" id="navSup">Suppliers</button>
+</div>
+
 <div class="pg">
-  <div class="main-grid">
-    <div class="vnc-panel">
-      <h3><span data-en="Device Screen" data-zh="设备屏幕">Device Screen</span> <span class="pill" id="vSt">off</span></h3>
-      <div class="vnc-frame" id="vf"><div class="vnc-placeholder" data-en="Click Connect" data-zh="点击连接" id="vPH">Click Connect</div></div>
-      <div class="vnc-ctrl">
-        <button class="btn success" onclick="vncOn()" data-en="Connect" data-zh="连接">Connect</button>
-        <button class="btn" onclick="vncOff()" data-en="Disconnect" data-zh="断开">Disconnect</button>
+
+<!-- AUTH -->
+<div id="vAuth">
+  <div class="auth-wrap">
+    <div class="auth-logo">PACKSIFY</div>
+    <div class="auth-sub" data-t="authSub">Connect and manage your top-up devices</div>
+    <div class="card" style="text-align:left">
+      <div class="auth-tabs">
+        <button class="on" id="tLogin" onclick="setAuth('login')" data-t="login">Sign In</button>
+        <button id="tReg" onclick="setAuth('register')" data-t="register">Register</button>
       </div>
-    </div>
-    <div class="right-panel">
-      <div class="sim">
-        <div class="sim-t" data-en="Simulate Session" data-zh="模拟会话">Simulate Session</div>
-        <div class="sim-row">
-          <div class="sim-field"><label data-en="Customer" data-zh="客户">Customer</label><input id="simC" value="whale-001"/></div>
-          <div class="sim-field"><label data-en="Game" data-zh="游戏">Game</label><select id="simG"><option>kingshot</option><option>whiteout</option><option>evony</option><option>lastwar</option></select></div>
-          <div class="sim-field"><label data-en="Credits" data-zh="额度">Credits</label><input id="simCr" type="number" value="50" min="5" style="width:50px"/></div>
-          <div class="sim-actions">
-            <button class="btn success sm" onclick="simStart()" data-en="Start" data-zh="开始">Start</button>
-            <button class="btn primary sm" onclick="simPurchase()" data-en="Buy" data-zh="购买">Buy</button>
-            <button class="btn danger sm" onclick="simEnd()" data-en="End" data-zh="结束">End</button>
-          </div>
-        </div>
-        <div class="sim-log" id="sL"><span class="info" data-en="Ready." data-zh="就绪。">Ready.</span></div>
+      <div id="regF1" class="hide"><input id="fName" placeholder="Name"/></div>
+      <input id="fEmail" placeholder="Email" type="email"/>
+      <div id="regF2" class="hide">
+        <input id="fWechat" placeholder="WeChat ID"/>
+        <input id="fPhone" placeholder="Phone"/>
       </div>
-      <div class="stats">
-        <div class="sc"><div class="sc-l" data-en="Online" data-zh="在线">Online</div><div class="sc-v g" id="sOn">-</div><div class="sc-s" id="sOnS"></div></div>
-        <div class="sc"><div class="sc-l" data-en="Sessions" data-zh="会话">Sessions</div><div class="sc-v y" id="sSe">-</div><div class="sc-s" id="sSeS"></div></div>
-        <div class="sc"><div class="sc-l" data-en="Queue" data-zh="排队">Queue</div><div class="sc-v b" id="sQ">-</div><div class="sc-s" id="sQS"></div></div>
-        <div class="sc"><div class="sc-l" data-en="Buys" data-zh="购买">Buys</div><div class="sc-v" id="sP">-</div><div class="sc-s" id="sPS"></div></div>
-        <div class="sc"><div class="sc-l" data-en="Balance" data-zh="余额">Balance</div><div class="sc-v" id="sB">-</div><div class="sc-s">Apple $</div></div>
-      </div>
-      <div class="sec">
-        <div class="sh"><div class="st" data-en="Devices" data-zh="设备">Devices</div><div class="cnt" id="dC">0</div></div>
-        <div class="tw"><table><thead><tr>
-          <th data-en="Device" data-zh="设备">Device</th><th data-en="Status" data-zh="状态">Status</th><th data-en="Game" data-zh="游戏">Game</th>
-          <th data-en="Bal" data-zh="余额">Bal</th><th data-en="Customer" data-zh="客户">Customer</th><th>HB</th><th></th>
-        </tr></thead><tbody id="dB"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody></table></div>
-      </div>
-    </div>
-  </div>
-  <div class="g2">
-    <div class="sec">
-      <div class="sh"><div class="st" data-en="Active Sessions" data-zh="活跃会话">Active Sessions</div><div class="cnt" id="seC">0</div></div>
-      <div class="tw"><table><thead><tr>
-        <th data-en="Customer" data-zh="客户">Customer</th><th data-en="Device" data-zh="设备">Device</th>
-        <th data-en="Time" data-zh="时间">Time</th><th data-en="Credits" data-zh="额度">Credits</th>
-        <th data-en="Buys" data-zh="购买">Buys</th><th></th>
-      </tr></thead><tbody id="seB"><tr><td colspan="6" class="empty" data-en="No sessions" data-zh="无会话">No sessions</td></tr></tbody></table></div>
-    </div>
-    <div class="sec">
-      <div class="sh"><div class="st" data-en="Queue" data-zh="排队">Queue</div><div class="cnt" id="qC">0</div></div>
-      <div class="tw"><table><thead><tr>
-        <th>#</th><th data-en="Customer" data-zh="客户">Customer</th>
-        <th data-en="Game" data-zh="游戏">Game</th><th data-en="Wait" data-zh="等待">Wait</th><th></th>
-      </tr></thead><tbody id="qB"><tr><td colspan="5" class="empty" data-en="Empty" data-zh="空">Empty</td></tr></tbody></table></div>
-    </div>
-  </div>
-  <div class="bottom">
-    <div class="sec">
-      <div class="sh"><div class="st" data-en="Purchases" data-zh="购买记录">Purchases</div><div class="cnt" id="pC">0</div></div>
-      <div class="tw"><table><thead><tr>
-        <th data-en="Time" data-zh="时间">Time</th><th data-en="Customer" data-zh="客户">Customer</th>
-        <th data-en="Device" data-zh="设备">Device</th><th data-en="Pack" data-zh="礼包">Pack</th>
-        <th data-en="Price" data-zh="价格">Price</th><th data-en="Status" data-zh="状态">Status</th>
-      </tr></thead><tbody id="pB"><tr><td colspan="6" class="empty" data-en="No purchases" data-zh="无购买记录">No purchases</td></tr></tbody></table></div>
+      <div class="err" id="authErr"></div>
+      <button class="btn btn-p btn-full" onclick="doAuth()" data-t="submit" style="padding:12px">Continue</button>
     </div>
   </div>
 </div>
+
+<!-- DEVICES -->
+<div id="vDevices" class="hide">
+  <div class="stats" id="statsRow"></div>
+  <div class="card">
+    <div class="card-t"><span data-t="yourDevices">Your Devices</span><span class="badge" id="devCount">0</span></div>
+    <div class="dev-grid" id="devGrid"></div>
+  </div>
+</div>
+
+<!-- ADD DEVICE -->
+<div id="vAdd" class="hide">
+  <div style="max-width:420px;margin:0 auto">
+    <div class="card">
+      <div class="card-t" data-t="addDevice">Add Device</div>
+      <div class="steps" id="stepsBox"></div>
+      <input id="fDevName" placeholder="Device name (e.g. iPhone 12 #3)"/>
+      <div class="form-label" data-t="game">Game</div>
+      <select id="fGame"><option value="kingshot">Kingshot</option><option value="whiteout">Whiteout Survival</option><option value="evony">Evony</option><option value="lastwar">Last War</option><option value="stateofsurvival">State of Survival</option></select>
+      <button class="btn btn-p btn-full" onclick="genCode()" id="genBtn" data-t="generate" style="padding:12px">Generate Pairing Code</button>
+    </div>
+    <!-- Show code after generation -->
+    <div class="card hide" id="codeCard" style="text-align:center">
+      <div style="font-size:14px;font-weight:700;color:#81adf3;margin-bottom:4px" data-t="codeTitle">Your Pairing Code</div>
+      <div class="code-display" id="bigCode"></div>
+      <div style="font-size:12px;color:#6a7d94" data-t="codeInstr">Enter this code in the Agent app on the iPhone</div>
+      <div style="font-size:11px;color:#e8506a;margin-top:4px" data-t="codeExpiry">Expires in 10 minutes</div>
+      <div style="display:flex;gap:6px;margin-top:14px;justify-content:center">
+        <button class="btn" onclick="genAnother()" data-t="newCode">New Code</button>
+        <button class="btn btn-p" onclick="go('devices')" data-t="done">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SESSIONS -->
+<div id="vSessions" class="hide">
+  <div class="card">
+    <div class="card-t"><span data-t="activeSessions">Active Sessions</span><span class="badge" id="sesCount">0</span></div>
+    <div class="tw"><table><thead><tr><th data-t="customer">Customer</th><th data-t="device">Device</th><th data-t="game">Game</th><th data-t="time">Time</th><th data-t="credits">Credits</th><th></th></tr></thead><tbody id="sesBody"><tr><td colspan="6" class="dim" style="text-align:center;padding:20px">No active sessions</td></tr></tbody></table></div>
+  </div>
+</div>
+
+<!-- PURCHASES -->
+<div id="vPurchases" class="hide">
+  <div class="card">
+    <div class="card-t"><span data-t="purchases">Purchases</span><span class="badge" id="purCount">0</span></div>
+    <div class="tw"><table><thead><tr><th data-t="time">Time</th><th data-t="customer">Customer</th><th data-t="device">Device</th><th>Pack</th><th data-t="price">Price</th><th data-t="status">Status</th></tr></thead><tbody id="purBody"><tr><td colspan="6" class="dim" style="text-align:center;padding:20px">No purchases</td></tr></tbody></table></div>
+  </div>
+</div>
+
+<!-- SUPPLIERS (admin only) -->
+<div id="vSuppliers" class="hide">
+  <div class="card">
+    <div class="card-t"><span>All Suppliers</span><span class="badge" id="supCount">0</span></div>
+    <div class="tw"><table><thead><tr><th>Name</th><th>Email</th><th>WeChat</th><th>Devices</th><th data-t="status">Status</th><th>Joined</th></tr></thead><tbody id="supBody"></tbody></table></div>
+  </div>
+</div>
+
+</div><!-- .pg -->
+
+<!-- VNC OVERLAY -->
+<div class="vnc-overlay hide" id="vncOverlay">
+  <div class="vnc-bar">
+    <div class="vnc-bar-left">
+      <button class="btn" onclick="closeVnc()">X Close</button>
+      <div class="vnc-bar-name" id="vncName">Device</div>
+      <span class="pill pill-g"><span class="pulse"></span>Live</span>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <span class="vnc-bar-meta" id="vncMeta"></span>
+    </div>
+  </div>
+  <div class="vnc-body">
+    <div class="vnc-frame" id="vncFrame"></div>
+  </div>
+</div>
+
 <div class="toasts" id="toasts"></div>
+
 <script>
-var db=window.supabase.createClient('https://tewircokuexllpzmrapz.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRld2lyY29rdWV4bGxwem1yYXB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MjI3NzMsImV4cCI6MjA5MDE5ODc3M30.6JaFXJwq1CQx8u4HPfAYSkLFSDSSTEcAJeF_4YFCRKY');
-var D=[],S=[],P=[],Q=[],sim=null,lang='en';
-function $(id){return document.getElementById(id)}
+var SB_URL='https://tewircokuexllpzmrapz.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRld2lyY29rdWV4bGxwem1yYXB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MjI3NzMsImV4cCI6MjA5MDE5ODc3M30.6JaFXJwq1CQx8u4HPfAYSkLFSDSSTEcAJeF_4YFCRKY';
+var db=window.supabase.createClient(SB_URL,SB_KEY);
+var user=null,lang='en',authMode='login',devices=[],sessions=[],purchases=[],suppliers=[],codes=[];
+var $=function(id){return document.getElementById(id)};
 
-// Language toggle
-function toggleLang(){
-  lang=lang==='en'?'zh':'en';
-  $('langBtn').textContent=lang==='en'?'中文':'EN';
-  document.querySelectorAll('[data-'+lang+']').forEach(function(el){
-    el.textContent=el.getAttribute('data-'+lang);
-  });
+// i18n
+var T={
+  en:{authSub:'Connect and manage your top-up devices',login:'Sign In',register:'Register',submit:'Continue',yourDevices:'Your Devices',addDevice:'Add Device',game:'Game',generate:'Generate Pairing Code',codeTitle:'Your Pairing Code',codeInstr:'Enter this in the Agent app on the iPhone',codeExpiry:'Expires in 10 minutes',newCode:'New Code',done:'Done',activeSessions:'Active Sessions',purchases:'Purchases',customer:'Customer',device:'Device',time:'Time',credits:'Credits',price:'Price',status:'Status',online:'Online',offline:'Offline',free:'Free',busy:'Busy',total:'Total',balance:'Balance',revenue:'Revenue',step1:'1. Install CatVNC from Sileo on the iPhone',step2:'2. Open this portal on the iPhone (agent.html)',step3:'3. Enter the pairing code',step4:'4. Device connects automatically',logout:'Logout',noDevices:'No devices yet. Add one to get started.',viewScreen:'View Screen',notFound:'Account not found',needFields:'Name and email required'},
+  zh:{authSub:'连接和管理您的充值设备',login:'登录',register:'注册',submit:'继续',yourDevices:'您的设备',addDevice:'添加设备',game:'游戏',generate:'生成配对码',codeTitle:'您的配对码',codeInstr:'在iPhone的Agent中输入此代码',codeExpiry:'10分钟内有效',newCode:'新配对码',done:'完成',activeSessions:'活跃会话',purchases:'购买记录',customer:'客户',device:'设备',time:'时间',credits:'额度',price:'价格',status:'状态',online:'在线',offline:'离线',free:'空闲',busy:'忙碌',total:'总计',balance:'余额',revenue:'收入',step1:'1. 从Sileo安装CatVNC',step2:'2. 在iPhone上打开此门户 (agent.html)',step3:'3. 输入配对码',step4:'4. 设备自动连接',logout:'退出',noDevices:'暂无设备，添加一个开始。',viewScreen:'查看屏幕',notFound:'未找到账户',needFields:'需要姓名和邮箱'}
+};
+function t(k){return T[lang][k]||k}
+function toggleLang(){lang=lang==='en'?'zh':'en';$('langBtn').textContent=lang==='en'?'中文':'EN';applyLang()}
+function applyLang(){document.querySelectorAll('[data-t]').forEach(function(el){var k=el.getAttribute('data-t');if(T[lang][k])el.textContent=T[lang][k]});$('stepsBox').innerHTML=t('step1')+'<br>'+t('step2')+'<br>'+t('step3')+'<br>'+t('step4')}
+
+// Auth
+function setAuth(m){authMode=m;$('tLogin').className=m==='login'?'on':'';$('tReg').className=m==='register'?'on':'';$('regF1').className=m==='register'?'':'hide';$('regF2').className=m==='register'?'':'hide';$('authErr').textContent=''}
+
+async function doAuth(){
+  $('authErr').textContent='';
+  var email=$('fEmail').value.trim();
+  if(authMode==='login'){
+    var r=await db.from('suppliers').select('*').eq('email',email).single();
+    if(r.error){$('authErr').textContent=t('notFound');return}
+    user=r.data;
+  }else{
+    var name=$('fName').value.trim();
+    if(!name||!email){$('authErr').textContent=t('needFields');return}
+    var r=await db.from('suppliers').insert({name:name,email:email,wechat_id:$('fWechat').value.trim()||null,phone:$('fPhone').value.trim()||null,language:lang}).select().single();
+    if(r.error){$('authErr').textContent=r.error.message;return}
+    user=r.data;
+  }
+  enterApp();
 }
 
-// VNC
-function vncOn(){
-  var frame=$('vf');frame.innerHTML='';
-  var f=document.createElement('iframe');
-  f.src='/vnc_lite.html?autoconnect=true&resize=scale&_='+Date.now();
-  f.setAttribute('scrolling','no');
-  f.setAttribute('allowfullscreen','');
-  f.style.cssText='width:100%;height:100%;border:none;display:block;overflow:hidden';
-  frame.appendChild(f);
-  $('vSt').textContent='on';$('vSt').className='pill active';
-  toast(lang==='en'?'Connecting...':'连接中...','info');
+function enterApp(){
+  $('vAuth').classList.add('hide');
+  $('navBar').classList.remove('hide');
+  $('logoutBtn').classList.remove('hide');
+  $('hUser').textContent=user.name;
+  if(user.role==='admin')$('navSup').classList.remove('hide');
+  applyLang();
+  go('devices');
+  startPolling();
 }
-function vncOff(){
-  $('vf').innerHTML='<div class="vnc-placeholder">'+(lang==='en'?'Disconnected':'已断开')+'</div>';
-  $('vSt').textContent='off';$('vSt').className='pill offline';
+
+function logout(){
+  user=null;devices=[];sessions=[];purchases=[];suppliers=[];
+  $('vAuth').classList.remove('hide');
+  $('navBar').classList.add('hide');
+  $('logoutBtn').classList.add('hide');
+  $('hUser').textContent='';
+  $('navSup').classList.add('hide');
+  hideAll();
+}
+
+// Navigation
+function hideAll(){['vDevices','vAdd','vSessions','vPurchases','vSuppliers'].forEach(function(v){$(v).classList.add('hide')})}
+function go(tab){
+  hideAll();
+  document.querySelectorAll('.nav button').forEach(function(b){b.classList.remove('on')});
+  if(tab==='devices'){$('vDevices').classList.remove('hide');$('navDev').classList.add('on');fetchAll()}
+  else if(tab==='add'){$('vAdd').classList.remove('hide');$('navAdd').classList.add('on');$('codeCard').classList.add('hide');$('fDevName').value='';$('fGame').value='kingshot'}
+  else if(tab==='sessions'){$('vSessions').classList.remove('hide');$('navSes').classList.add('on');fetchSessions()}
+  else if(tab==='purchases'){$('vPurchases').classList.remove('hide');$('navPur').classList.add('on');fetchPurchases()}
+  else if(tab==='suppliers'){$('vSuppliers').classList.remove('hide');$('navSup').classList.add('on');fetchSuppliers()}
 }
 
 // Data
-async function init(){
-  try{
-    await refreshAll();
-    db.channel('a')
-      .on('postgres_changes',{event:'*',schema:'public',table:'topup_devices'},function(){fD();st()})
-      .on('postgres_changes',{event:'*',schema:'public',table:'topup_sessions'},function(){fS();st()})
-      .on('postgres_changes',{event:'*',schema:'public',table:'topup_purchases'},function(p){fP();st();if(p.eventType==='INSERT')toast('$'+p.new.price_usd,'info')})
-      .on('postgres_changes',{event:'*',schema:'public',table:'topup_queue'},function(){fQ();st()})
-      .subscribe();
-    $('cD').className='dot';$('cL').textContent='Live';
-    setInterval(uT,1000);toast(lang==='en'?'Connected':'已连接','success');
-  }catch(e){$('cD').className='dot off';$('cL').textContent='Err';toast(e.message,'error')}
+async function fetchAll(){
+  var q=db.from('topup_devices').select('*').order('created_at',{ascending:false});
+  if(user.role!=='admin')q=q.eq('supplier_id',user.id);
+  var r=await q;devices=r.data||[];
+  renderDevices();renderStats();
 }
-async function refreshAll(){await Promise.all([fD(),fS(),fP(),fQ()]);st()}
-async function fD(){var r=await db.from('topup_devices').select('*').order('id');D=r.data||[];rD()}
-async function fS(){var r=await db.from('topup_sessions').select('*').eq('status','active').order('started_at',{ascending:false});S=r.data||[];rS()}
-async function fP(){var r=await db.from('topup_purchases').select('*').order('created_at',{ascending:false}).limit(30);P=r.data||[];rP()}
-async function fQ(){var r=await db.from('topup_queue').select('*').in('status',['waiting','ready']).order('created_at');Q=r.data||[];rQ()}
+async function fetchSessions(){
+  var q=db.from('topup_sessions').select('*').order('started_at',{ascending:false}).limit(50);
+  if(user.role!=='admin'){
+    var dids=devices.map(function(d){return d.id});
+    if(dids.length)q=q.in('device_id',dids);
+    else{sessions=[];renderSessions();return}
+  }
+  var r=await q;sessions=r.data||[];renderSessions();
+}
+async function fetchPurchases(){
+  var q=db.from('topup_purchases').select('*').order('created_at',{ascending:false}).limit(50);
+  if(user.role!=='admin'){
+    var dids=devices.map(function(d){return d.id});
+    if(dids.length)q=q.in('device_id',dids);
+    else{purchases=[];renderPurchases();return}
+  }
+  var r=await q;purchases=r.data||[];renderPurchases();
+}
+async function fetchSuppliers(){
+  var r=await db.from('suppliers').select('*').order('created_at',{ascending:false});
+  suppliers=r.data||[];renderSuppliers();
+}
 
-function rD(){var t=$('dB');$('dC').textContent=D.length;if(!D.length){t.innerHTML='<tr><td colspan="7" class="empty">'+(lang==='en'?'No devices.':'无设备')+'</td></tr>';return}t.innerHTML=D.map(function(d){return'<tr><td><strong>'+d.id+'</strong><div class="dim" style="font-size:8px">'+d.ip+'</div></td><td><span class="pill '+d.status+'"><span class="pd"></span>'+d.status+'</span></td><td>'+d.game+'</td><td>$<input class="bi" type="number" step="0.01" value="'+(d.apple_balance||0)+'" onchange="uB(\''+d.id+'\',this.value)"/></td><td>'+(d.assigned_customer?'<span style="color:var(--yel)">'+d.assigned_customer+'</span>':'<span class="dim">-</span>')+'</td><td class="mono dim">'+(d.last_heartbeat?ago(d.last_heartbeat):'-')+'</td><td><div class="bg">'+(d.status==='busy'?'<button class="btn danger" onclick="ff(\''+d.id+'\')">Free</button>':'')+(d.status!=='offline'?'<button class="btn" onclick="tO(\''+d.id+'\',true)">Off</button>':'<button class="btn primary" onclick="tO(\''+d.id+'\',false)">On</button>')+'</div></td></tr>'}).join('')}
-function rS(){var t=$('seB');$('seC').textContent=S.length;if(!S.length){t.innerHTML='<tr><td colspan="6" class="empty">'+(lang==='en'?'No sessions':'无会话')+'</td></tr>';return}t.innerHTML=S.map(function(s){var c=(s.credits_allocated-s.credits_spent).toFixed(2);return'<tr><td><strong>'+s.customer_id+'</strong></td><td>'+s.device_id+'</td><td class="mono tm" data-e="'+s.expires_at+'">'+tl(s.expires_at)+'</td><td><span style="color:var(--grn)">$'+c+'</span><span class="dim">/$'+s.credits_allocated+'</span></td><td>'+s.purchases+'</td><td><button class="btn danger" onclick="eS(\''+s.id+'\',\''+s.device_id+'\')">'+(lang==='en'?'End':'结束')+'</button></td></tr>'}).join('')}
-function rP(){var t=$('pB');var td=new Date().toISOString().split('T')[0];var tp=P.filter(function(p){return p.created_at&&p.created_at.startsWith(td)});$('pC').textContent=tp.length+(lang==='en'?' today':' 今天');if(!P.length){t.innerHTML='<tr><td colspan="6" class="empty">'+(lang==='en'?'No purchases':'无购买记录')+'</td></tr>';return}t.innerHTML=P.map(function(p){return'<tr><td class="mono dim">'+ft(p.created_at)+'</td><td>'+p.customer_id+'</td><td>'+(p.device_id||'-')+'</td><td>'+p.pack_name+'</td><td><strong>$'+Number(p.price_usd).toFixed(2)+'</strong></td><td><span class="pill '+p.status+'">'+p.status+'</span></td></tr>'}).join('')}
-function rQ(){var t=$('qB');var w=Q.filter(function(q){return q.status==='waiting'}).length;$('qC').textContent=w;if(!Q.length){t.innerHTML='<tr><td colspan="5" class="empty">'+(lang==='en'?'Empty':'空')+'</td></tr>';return}t.innerHTML=Q.map(function(q,i){return'<tr><td class="mono">'+(i+1)+'</td><td>'+q.customer_id+'</td><td>'+q.game+'</td><td class="mono dim">'+ago(q.created_at)+'</td><td><button class="btn danger" onclick="cQ(\''+q.id+'\')">X</button></td></tr>'}).join('')}
-function st(){var on=D.filter(function(d){return d.status!=='offline'}).length;var fr=D.filter(function(d){return d.status==='free'}).length;var bal=D.reduce(function(s,d){return s+Number(d.apple_balance||0)},0);var td=new Date().toISOString().split('T')[0];var tp=P.filter(function(p){return p.created_at&&p.created_at.startsWith(td)});var rev=tp.reduce(function(s,p){return s+Number(p.price_usd||0)},0);var wc=Q.filter(function(q){return q.status==='waiting'}).length;$('sOn').textContent=on;$('sOnS').textContent=fr+(lang==='en'?' free':' 空闲');$('sSe').textContent=S.length;$('sSeS').textContent=S.length?(lang==='en'?'active':'活跃'):'';$('sQ').textContent=wc;$('sQS').textContent=wc?(lang==='en'?'wait':'等待'):'';$('sP').textContent=tp.length;$('sPS').textContent='$'+rev.toFixed(0);$('sB').textContent='$'+bal.toFixed(0)}
+// Render
+function renderStats(){
+  var on=devices.filter(function(d){return d.status!=='offline'}).length;
+  var bal=devices.reduce(function(s,d){return s+Number(d.apple_balance||0)},0);
+  $('statsRow').innerHTML='<div class="stat"><div class="stat-l">'+t('total')+'</div><div class="stat-v blu">'+devices.length+'</div></div>'
+    +'<div class="stat"><div class="stat-l">'+t('online')+'</div><div class="stat-v grn">'+on+'</div></div>'
+    +'<div class="stat"><div class="stat-l">'+t('balance')+'</div><div class="stat-v yel">$'+bal.toFixed(0)+'</div></div>';
+}
 
-// Sim
-function sl(m,c){var l=$('sL');l.innerHTML+='\n<span class="'+(c||'')+'">['+new Date().toLocaleTimeString('en-US',{hour12:false}).slice(0,5)+'] '+m+'</span>';l.scrollTop=l.scrollHeight}
-async function simStart(){var ci=$('simC').value.trim(),gm=$('simG').value,cr=parseFloat($('simCr').value)||50;if(!ci){sl(lang==='en'?'Need ID':'需要ID','err');return}if(cr<5){sl('Min $5','err');return}if(sim){sl(lang==='en'?'End first':'先结束','err');return}await fD();sl(ci+' | '+gm+' | $'+cr,'info');var fd=D.find(function(d){return d.status==='free'&&d.game===gm});if(!fd){var any=D.find(function(d){return d.game===gm});sl(any?any.id+' "'+any.status+'"':(lang==='en'?'No device':'无设备'),'err');return}var now=new Date(),exp=new Date(now.getTime()+1800000);var res=await db.from('topup_sessions').insert({customer_id:ci,device_id:fd.id,game:gm,credits_allocated:cr,credits_spent:0,purchases:0,started_at:now.toISOString(),expires_at:exp.toISOString(),status:'active'}).select().single();if(res.error){sl(res.error.message,'err');return}await db.from('topup_devices').update({status:'busy',assigned_customer:ci,assigned_session:res.data.id}).eq('id',fd.id);sim={id:res.data.id,did:fd.id,ci:ci,al:cr,sp:0,n:0};sl((lang==='en'?'Started':'已开始')+' '+fd.id+' | $'+cr,'ok')}
-async function simPurchase(){if(!sim){sl(lang==='en'?'Start first':'先开始','err');return}var pr=[0.99,1.99,2.99,4.99,9.99,14.99,19.99,49.99];var pk=['Mini','Starter','Value','Growth','Elite','Mega','Diamond','Whale'];var i=Math.floor(Math.random()*pr.length),price=pr[i],pack=pk[i]+' Pack';var ns=sim.sp+price;if(ns>sim.al){sl('$'+price+' > $'+(sim.al-sim.sp).toFixed(2),'err');return}await db.from('topup_purchases').insert({session_id:sim.id,customer_id:sim.ci,device_id:sim.did,pack_name:pack,price_usd:price,status:'confirmed'});sim.sp=ns;sim.n++;await db.from('topup_sessions').update({credits_spent:ns,purchases:sim.n}).eq('id',sim.id);var dv=D.find(function(d){return d.id===sim.did});if(dv)await db.from('topup_devices').update({apple_balance:Math.max(0,Number(dv.apple_balance||0)-price)}).eq('id',dv.id);sl(pack+' $'+price+' | $'+(sim.al-ns).toFixed(2),'ok')}
-async function simEnd(){if(!sim){sl(lang==='en'?'No session':'无会话','err');return}await db.from('topup_sessions').update({status:'ended',ended_at:new Date().toISOString()}).eq('id',sim.id);await db.from('topup_devices').update({status:'free',assigned_customer:null,assigned_session:null}).eq('id',sim.did);sl(sim.n+(lang==='en'?' buys $':' 次 $')+sim.sp.toFixed(2),'ok');sim=null}
+function renderDevices(){
+  $('devCount').textContent=devices.length;
+  if(!devices.length){$('devGrid').innerHTML='<div style="text-align:center;padding:30px;color:#6a7d94;font-size:12px;grid-column:1/-1">'+t('noDevices')+'</div>';return}
+  $('devGrid').innerHTML=devices.map(function(d){
+    var st=d.status||'offline';
+    var pc=st==='offline'?'pill-r':st==='busy'?'pill-y':'pill-g';
+    var isOnline=st!=='offline';
+    return'<div class="dev-card" onclick="openVnc(\''+d.id+'\')">'
+      +'<div class="dev-top"><div><div class="dev-name">'+(d.device_name||d.id)+'</div><div class="dev-meta">'+d.game+' / '+d.ip+'</div></div><span class="pill '+pc+'">'+(isOnline?'<span class="pulse"></span>':'')+t(st)+'</span></div>'
+      +'<div class="dev-screen"><div class="dev-screen-ph">'+(isOnline?t('viewScreen'):'Offline')+'</div></div>'
+      +'<div class="dev-bottom"><span class="dev-bal">$'+Number(d.apple_balance||0).toFixed(0)+'</span>'
+      +'<span style="font-size:10px;color:#6a7d94">'+ago(d.last_heartbeat)+'</span></div>'
+      +'</div>';
+  }).join('');
+}
 
-async function uB(id,v){await db.from('topup_devices').update({apple_balance:parseFloat(v)||0}).eq('id',id);toast('OK','success')}
-async function tO(id,off){await db.from('topup_devices').update(off?{status:'offline',vnc_active:false}:{status:'free',vnc_active:true}).eq('id',id);toast(id+' '+(off?'off':'on'),'success')}
-async function ff(id){await db.from('topup_devices').update({status:'free',assigned_customer:null,assigned_session:null}).eq('id',id);await db.from('topup_sessions').update({status:'ended',ended_at:new Date().toISOString()}).eq('device_id',id).eq('status','active');sim=null;toast('OK','success')}
-async function eS(sid,did){await db.from('topup_sessions').update({status:'ended',ended_at:new Date().toISOString()}).eq('id',sid);await db.from('topup_devices').update({status:'free',assigned_customer:null,assigned_session:null}).eq('id',did);if(sim&&sim.id===sid)sim=null;toast('OK','success')}
-async function cQ(id){await db.from('topup_queue').update({status:'cancelled'}).eq('id',id)}
+function renderSessions(){
+  $('sesCount').textContent=sessions.filter(function(s){return s.status==='active'}).length;
+  if(!sessions.length){$('sesBody').innerHTML='<tr><td colspan="6" class="dim" style="text-align:center;padding:20px">No sessions</td></tr>';return}
+  $('sesBody').innerHTML=sessions.slice(0,20).map(function(s){
+    var left=(s.credits_allocated-s.credits_spent).toFixed(2);
+    var pc=s.status==='active'?'pill-g':s.status==='ended'?'pill-r':'pill-y';
+    return'<tr><td>'+s.customer_id+'</td><td>'+(s.device_id||'-')+'</td><td>'+s.game+'</td><td class="mono">'+ago(s.started_at)+'</td><td><span class="grn">$'+left+'</span><span class="dim">/$'+s.credits_allocated+'</span></td><td><span class="pill '+pc+'">'+s.status+'</span></td></tr>';
+  }).join('');
+}
 
+function renderPurchases(){
+  var td=new Date().toISOString().split('T')[0];
+  var tp=purchases.filter(function(p){return p.created_at&&p.created_at.startsWith(td)});
+  $('purCount').textContent=tp.length+' today';
+  if(!purchases.length){$('purBody').innerHTML='<tr><td colspan="6" class="dim" style="text-align:center;padding:20px">No purchases</td></tr>';return}
+  $('purBody').innerHTML=purchases.slice(0,30).map(function(p){
+    var pc=p.status==='confirmed'?'pill-g':'pill-y';
+    return'<tr><td class="mono dim">'+ft(p.created_at)+'</td><td>'+p.customer_id+'</td><td>'+(p.device_id||'-')+'</td><td>'+p.pack_name+'</td><td><strong>$'+Number(p.price_usd).toFixed(2)+'</strong></td><td><span class="pill '+pc+'">'+p.status+'</span></td></tr>';
+  }).join('');
+}
+
+function renderSuppliers(){
+  $('supCount').textContent=suppliers.length;
+  $('supBody').innerHTML=suppliers.map(function(s){
+    var pc=s.status==='active'?'pill-g':'pill-r';
+    return'<tr><td><strong>'+s.name+'</strong></td><td>'+s.email+'</td><td>'+(s.wechat_id||'-')+'</td><td>'+s.devices_count+'</td><td><span class="pill '+pc+'">'+s.status+'</span></td><td class="dim mono">'+ago(s.created_at)+'</td></tr>';
+  }).join('');
+}
+
+// VNC
+function openVnc(devId){
+  var d=devices.find(function(x){return x.id===devId});
+  if(!d)return;
+  $('vncName').textContent=d.device_name||d.id;
+  $('vncMeta').textContent=d.game+' / '+d.ip+':'+d.vnc_port;
+  var frame=$('vncFrame');
+  // Try to load VNC viewer
+  // If device has a vnc_url, use that. Otherwise try local noVNC path.
+  var vncSrc=d.vnc_url||'/vnc_lite.html?autoconnect=true&resize=scale&_='+Date.now();
+  frame.innerHTML='<iframe src="'+vncSrc+'" style="width:100%;height:100%;border:none" scrolling="no" allowfullscreen></iframe>';
+  $('vncOverlay').classList.remove('hide');
+  document.body.style.overflow='hidden';
+}
+
+function closeVnc(){
+  $('vncOverlay').classList.add('hide');
+  $('vncFrame').innerHTML='';
+  document.body.style.overflow='';
+}
+
+// Add device
+async function genCode(){
+  var code=String(Math.floor(100000+Math.random()*900000));
+  var name=$('fDevName').value.trim()||('Device '+(devices.length+1));
+  var game=$('fGame').value;
+  var r=await db.from('pairing_codes').insert({code:code,supplier_id:user.id,device_name:name,game:game}).select().single();
+  if(r.error){toast(r.error.message,'bad');return}
+  $('bigCode').textContent=code;
+  $('codeCard').classList.remove('hide');
+  toast('Code: '+code,'ok');
+}
+function genAnother(){$('codeCard').classList.add('hide');$('fDevName').value=''}
+
+// Polling
+var pollIv=null;
+function startPolling(){pollIv=setInterval(function(){if(!$('vDevices').classList.contains('hide'))fetchAll()},12000)}
+
+// Helpers
 function ago(ts){if(!ts)return'-';var d=Date.now()-new Date(ts).getTime(),s=Math.floor(d/1000);if(s<5)return'now';if(s<60)return s+'s';var m=Math.floor(s/60);if(m<60)return m+'m';var h=Math.floor(m/60);return h<24?h+'h':Math.floor(h/24)+'d'}
-function tl(e){if(!e)return'--:--';var d=new Date(e).getTime()-Date.now();if(d<=0)return'EXP';var m=Math.floor(d/60000),s=Math.floor((d%60000)/1000);return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
-function ft(t){return t?new Date(t).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}):'-'}
-function uT(){document.querySelectorAll('.tm').forEach(function(el){var e=el.dataset.e;if(e){var r=tl(e);el.textContent=r;el.style.color=r==='EXP'?'var(--red)':'var(--yel)'}})}
+function ft(ts){return ts?new Date(ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}):'-'}
 function toast(m,t){var c=$('toasts'),e=document.createElement('div');e.className='toast '+(t||'info');e.textContent=m;c.appendChild(e);setTimeout(function(){e.style.opacity='0';setTimeout(function(){e.remove()},300)},3000)}
-init();
+
+// Init
+applyLang();
 </script>
 </body>
 </html>
